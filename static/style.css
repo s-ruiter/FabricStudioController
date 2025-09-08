@@ -97,6 +97,7 @@ section + section { margin-top: 16px; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  align-items: start;
 }
 
 .left-col, .right-col {
@@ -216,14 +217,14 @@ pre {
 
 .filter-section {
   display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .action-section {
   display: flex;
-  justify-content: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .filter-control {
@@ -342,13 +343,8 @@ pre {
   .vm-item { grid-template-columns: auto auto 1fr; grid-auto-rows: auto; row-gap: 8px; }
   .vm-item span:last-child { justify-self: end; }
   
-  .filter-section {
+  .action-section {
     flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .filter-control {
-    min-width: auto;
   }
   
   .action-button {
