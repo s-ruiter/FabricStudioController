@@ -33,6 +33,42 @@ gcloud config set project YOUR_PROJECT_ID
 
 ## Installation
 
+### **Option 1: Docker (Recommended)**
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/s-ruiter/FabricStudioController.git
+cd FabricStudioController
+```
+
+2. **Set up Google Cloud authentication**
+```bash
+# Install gcloud CLI if not already installed
+# macOS: brew install google-cloud-sdk
+# Or download from: https://cloud.google.com/sdk/docs/install
+
+# Authenticate with Google Cloud
+gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
+```
+
+3. **Run with Docker**
+```bash
+# Use the automated deployment script
+./deploy.sh
+
+# Or run manually
+docker build -t fabricstudio-controller .
+docker run -d -p 8000:8000 --name fabricstudio \
+  -v ~/.config/gcloud:/root/.config/gcloud \
+  fabricstudio-controller
+```
+
+4. **Access the application**
+Open your browser to: http://localhost:8000
+
+### **Option 2: Local Python Installation**
+
 1. **Clone the repository**
 ```bash
 git clone https://github.com/s-ruiter/FabricStudioController.git
@@ -44,16 +80,24 @@ cd FabricStudioController
 pip install -r requirements.txt
 ```
 
+3. **Set up Google Cloud authentication**
+```bash
+gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
+```
 
-## Usage
-
-1. **Start the application**
+4. **Run the application**
 ```bash
 python app.py
 ```
 
+## Usage
+
+1. **Start the application** (see Installation section above)
+
 2. **Open your browser**
-Navigate to `http://localhost:5000`
+   - Docker: Navigate to `http://localhost:8000`
+   - Local Python: Navigate to `http://localhost:5000`
 
 3. **Use the interface**
    - **Left Column**: Execute FabricStudio commands
@@ -90,12 +134,86 @@ COMMAND_OPTIONS = {
 }
 ```
 
+## Deployment to Another Machine
+
+### **Quick Setup (Recommended)**
+
+1. **On the new machine, install prerequisites:**
+```bash
+# Install Docker
+# macOS: brew install --cask docker
+# Or download from: https://docs.docker.com/get-docker/
+
+# Install Google Cloud CLI
+# macOS: brew install google-cloud-sdk
+# Or download from: https://cloud.google.com/sdk/docs/install
+```
+
+2. **Clone and deploy:**
+```bash
+git clone https://github.com/s-ruiter/FabricStudioController.git
+cd FabricStudioController
+
+# Set up Google Cloud authentication
+gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
+
+# Deploy automatically
+./deploy.sh
+```
+
+3. **Access the application:**
+Open your browser to: http://localhost:8000
+
+### **Alternative: Docker Compose**
+
+```bash
+# Clone the repository
+git clone https://github.com/s-ruiter/FabricStudioController.git
+cd FabricStudioController
+
+# Set up authentication
+gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
+
+# Run with Docker Compose
+docker-compose up -d
+```
+
+### **Container Management**
+
+```bash
+# View logs
+docker logs fabricstudio
+
+# Stop the application
+docker stop fabricstudio
+
+# Start the application
+docker start fabricstudio
+
+# Remove the container
+docker stop fabricstudio && docker rm fabricstudio
+
+# Rebuild and restart
+docker stop fabricstudio && docker rm fabricstudio
+docker build -t fabricstudio-controller .
+docker run -d -p 8000:8000 --name fabricstudio \
+  -v ~/.config/gcloud:/root/.config/gcloud \
+  fabricstudio-controller
+```
+
 ## Project Structure
 
 ```
 FabricStudioController/
 ├── app.py                 # Flask application
 ├── requirements.txt       # Python dependencies
+├── Dockerfile            # Docker container definition
+├── docker-compose.yml    # Docker Compose configuration
+├── deploy.sh             # Automated deployment script
+├── run-docker.sh         # Docker run script
+├── setup-auth.sh         # Authentication setup script
 ├── static/
 │   ├── style.css         # Modern dark theme
 │   └── favicon.ico       # Application icon
