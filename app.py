@@ -149,7 +149,54 @@ def index():
 def favicon():
     return send_from_directory(app.static_folder, 'favicon.ico')
 
+# --- GCloud CLI Check ---
+def check_gcloud_cli():
+    """Check if gcloud CLI is installed and working."""
+    try:
+        result = subprocess.run(['gcloud', '--version'], capture_output=True, text=True, timeout=10)
+        if result.returncode != 0:
+            print("❌ Error: gcloud CLI is not working properly")
+            print(f"Error: {result.stderr}")
+            return False
+        
+        # Check if user is authenticated
+        auth_result = subprocess.run(['gcloud', 'auth', 'list', '--filter=status:ACTIVE', '--format=value(account)'], 
+                                   capture_output=True, text=True, timeout=10)
+        if not auth_result.stdout.strip():
+            print("❌ Warning: No active gcloud authentication found")
+            print("Please run: gcloud auth login")
+            return False
+            
+        # Check if project is set
+        project_result = subprocess.run(['gcloud', 'config', 'get-value', 'project'], 
+                                      capture_output=True, text=True, timeout=10)
+        if not project_result.stdout.strip():
+            print("❌ Warning: No gcloud project configured")
+            print("Please run: gcloud config set project YOUR_PROJECT_ID")
+            return False
+            
+        print("✅ gcloud CLI is installed and configured")
+        print(f"   Active account: {auth_result.stdout.strip()}")
+        print(f"   Project: {project_result.stdout.strip()}")
+        return True
+        
+    except FileNotFoundError:
+        print("❌ Error: gcloud CLI is not installed")
+        print("Please install Google Cloud CLI: https://cloud.google.com/sdk/docs/install")
+        return False
+    except subprocess.TimeoutExpired:
+        print("❌ Error: gcloud CLI check timed out")
+        return False
+    except Exception as e:
+        print(f"❌ Error checking gcloud CLI: {e}")
+        return False
+
 # --- Applicatie Startpunt ---
 if __name__ == '__main__':
+    print("🔍 Checking gcloud CLI...")
+    if not check_gcloud_cli():
+        print("\n⚠️  The application will start but VM management features may not work.")
+        print("   Please fix the gcloud CLI issues above before using VM features.\n")
+    
     app.run(debug=True)
 
