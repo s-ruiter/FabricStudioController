@@ -275,12 +275,17 @@
 
             // VM list will be loaded when user clicks "Fetch VM Status" button
 
-            // Bevestiging voor risicovolle acties
+            // Confirmation for risky actions
             const formEl = document.querySelector('form');
             formEl.addEventListener('submit', function(e) {
                 const selectedOption = commandSelect.options[commandSelect.selectedIndex];
                 const label = selectedOption.textContent.trim();
-                if (label === 'Shutdown Fabric Studio and VM' || label === 'Fabric Studio Upgrade') {
+                
+                // Check if the selected command requires a warning
+                const commandData = {{ commands | tojson }};
+                const selectedCommand = Object.values(commandData).find(cmd => cmd.command === selectedOption.value);
+                
+                if (selectedCommand && selectedCommand.warning) {
                     if (!confirm('Are you sure?')) {
                         e.preventDefault();
                     }

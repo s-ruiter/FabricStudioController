@@ -29,6 +29,7 @@ Each command can have the following properties:
 - **`disconnect`** (optional): Set to `true` if the command will disconnect (like reboot)
 - **`requires_extra_input`** (optional): Set to `true` if the command needs additional user input
 - **`prompt`** (optional): The prompt text to show when `requires_extra_input` is true
+- **`warning`** (optional): Set to `true` if the command should show "Are you sure?" confirmation
 
 ## Examples
 
@@ -58,6 +59,15 @@ Each command can have the following properties:
   "command": "systemctl reboot",
   "responses": {},
   "disconnect": true
+}
+```
+
+### Command with Warning
+```json
+"Delete All Data": {
+  "command": "rm -rf /data/*",
+  "responses": {},
+  "warning": true
 }
 ```
 
