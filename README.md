@@ -1,6 +1,6 @@
 # FabricStudio Controller
 
-A modern web interface for managing FortiAnalyzer Fabric Studio VMs and executing SSH commands. Features a sleek dark theme with a two-column layout for efficient workflow.
+A modern web interface for managing Fabric Studio VMs and executing SSH commands. Features a sleek dark theme with a two-column layout for efficient workflow.
 
 ## Features
 
@@ -106,11 +106,30 @@ python app.py
 
 ## Available Commands
 
+Commands are defined in `commands.json` and can be easily customized:
+
 - **Start FAZ workshop POC**: Install and power on FAZ-Workshop2025
 - **Stop FAZ workshop POC**: Uninstall the workshop environment
-- **Shutdown Fabric Studio and VM**: Shutdown the entire system
+- **Shutdown Fabric Studio and VM**: Shutdown the entire system (requires confirmation)
 - **Fabric Studio Upgrade**: Upgrade Fabric Studio (requires confirmation)
 - **Change guest user password**: Update guest user password
+
+### Adding New Commands
+
+To add or modify commands, edit `commands.json`:
+
+```json
+{
+  "Your New Command": {
+    "command": "your command here",
+    "responses": {},
+    "disconnect": false,
+    "warning": false
+  }
+}
+```
+
+See [COMMANDS.md](COMMANDS.md) for detailed documentation on command configuration.
 
 ## Configuration
 
@@ -123,16 +142,7 @@ To modify the filter, edit `app.py`:
 ```
 
 ### Commands
-Add new commands in `app.py`:
-```python
-COMMAND_OPTIONS = {
-    'Your New Command': {
-        'command': 'your command here',
-        'responses': {},
-        'disconnect': False
-    }
-}
-```
+Commands are now managed through `commands.json` - see the [Available Commands](#available-commands) section above for details.
 
 ## Deployment to Another Machine
 
