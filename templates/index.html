@@ -85,6 +85,7 @@
                         </div>
                         <div class="action-section">
                             <button type="button" id="fetch-vms-btn" class="action-button primary">Fetch VM Status</button>
+                            <button type="button" id="select-all-btn" class="action-button secondary" disabled>Select All VMs</button>
                             <button type="button" id="start-selected-btn" class="action-button secondary" disabled>Start Selected VMs</button>
                         </div>
                     </div>
@@ -108,6 +109,7 @@
             // --- Element References ---
             const fetchVmsBtn = document.getElementById('fetch-vms-btn');
             const startSelectedBtn = document.getElementById('start-selected-btn');
+            const selectAllBtn = document.getElementById('select-all-btn');
             const vmList = document.getElementById('vm-list');
             const hiddenIpInput = document.getElementById('ips');
             const ipDisplay = document.getElementById('selected-ips-display');
@@ -210,6 +212,7 @@
 
             function updateUiState() {
                 const selectedCheckboxes = Array.from(document.querySelectorAll('.vm-checkbox:checked'));
+                const allCheckboxes = Array.from(document.querySelectorAll('.vm-checkbox'));
                 
                 const selectedIps = selectedCheckboxes
                     .filter(cb => cb.dataset.status === 'RUNNING' && cb.dataset.ip)
@@ -220,6 +223,24 @@
 
                 const selectedTerminated = selectedCheckboxes.filter(cb => cb.dataset.status === 'TERMINATED');
                 startSelectedBtn.disabled = selectedTerminated.length === 0;
+                
+                // Update Select All button state
+                selectAllBtn.disabled = allCheckboxes.length === 0;
+                if (allCheckboxes.length > 0) {
+                    const allSelected = allCheckboxes.every(cb => cb.checked);
+                    selectAllBtn.textContent = allSelected ? 'Deselect All VMs' : 'Select All VMs';
+                }
+            }
+
+            function toggleSelectAll() {
+                const allCheckboxes = Array.from(document.querySelectorAll('.vm-checkbox'));
+                const allSelected = allCheckboxes.every(cb => cb.checked);
+                
+                allCheckboxes.forEach(cb => {
+                    cb.checked = !allSelected;
+                });
+                
+                updateUiState();
             }
 
             async function startSelectedVms() {
@@ -257,6 +278,7 @@
             
             fetchVmsBtn.addEventListener('click', fetchAndRenderVms);
             startSelectedBtn.addEventListener('click', startSelectedVms);
+            selectAllBtn.addEventListener('click', toggleSelectAll);
             vmList.addEventListener('change', updateUiState);
 
             function toggleExtraInput() {
