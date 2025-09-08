@@ -54,12 +54,14 @@
                     <label for="command">Choose a command:</label>
                     <select id="command" name="command" required>
                         {% for display, info in commands.items() %}
+                            {% if not display.startswith('_') %}
                             <option value="{{ info.command }}" 
                                     data-requires-input="{{ 'true' if info.get('requires_extra_input') else 'false' }}"
                                     data-prompt="{{ info.get('prompt', '') }}"
                                     {% if request.form.get('command') == info.command %}selected{% endif %}>
                                 {{ display }}
                             </option>
+                            {% endif %}
                         {% endfor %}
                     </select>
                     <div id="extra-input-container" style="display: none;">
@@ -283,7 +285,9 @@
                 
                 // Check if the selected command requires a warning
                 const commandData = {{ commands | tojson }};
-                const selectedCommand = Object.values(commandData).find(cmd => cmd.command === selectedOption.value);
+                const selectedCommand = Object.values(commandData).find(cmd => 
+                    typeof cmd === 'object' && cmd.command === selectedOption.value
+                );
                 
                 if (selectedCommand && selectedCommand.warning) {
                     if (!confirm('Are you sure?')) {
