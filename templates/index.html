@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FortiAnalyzer Workshop Controller</title>
+    <!-- Favicon link aangepast om Flask's 'url_for' te gebruiken -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}?v=2" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2">
+</head>
+<body>
+    <div class="container">
+        <h1>FortiAnalyzer Workshop Controller</h1>
+
+        <div class="grid-2col">
+            <section class="left-col">
+                <form method="post">
+                    <h2>FabricStudio Commands</h2>
+                    <label for="ips">Selected IP Addresses:</label>
+                    <p id="selected-ips-display"><i>Select active VMs from the list on the right.</i></p>
+                    <input type="hidden" id="ips" name="ips" value="{{ request.form.get('ips', '') }}">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" value="{{ request.form.get('username', 'admin') }}" required>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" value="{{ request.form.get('password', '') }}" required>
+                    <label for="command">Choose a command:</label>
+                    <select id="command" name="command" required>
+                        {% for display, info in commands.items() %}
+                            <option value="{{ info.command }}" 
+                                    data-requires-input="{{ 'true' if info.get('requires_extra_input') else 'false' }}"
+                                    data-prompt="{{ info.get('prompt', '') }}"
+                                    {% if request.form.get('command') == info.command %}selected{% endif %}>
+                                {{ display }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div id="extra-input-container" style="display: none;">
+                        <label for="extra-input" id="extra-input-label"></label>
+                        <input type="text" id="extra-input" name="extra_input" value="{{ request.form.get('extra_input', '') }}">
+                    </div>
+                    <button type="submit">Execute FabricStudio Command</button>
+                </form>
+            </section>
+
+            <section class="right-col">
+                <div class="vm-manager">
+                    <h2>VM Management</h2>
+                    <div class="vm-controls">
+                        <button type="button" id="fetch-vms-btn" class="action-button">Fetch VM Status</button>
+                        <button type="button" id="start-selected-btn" class="action-button" disabled>Start Selected VMs</button>
+                    </div>
+                    <div id="vm-status-message"></div>
+                    <ul id="vm-list" class="vm-list"></ul>
+                </div>
+            </section>
+        </div>
+
+        <section class="output-section">
+            {% if output %}
+                <h2>SSH Command Output:</h2>
+                <pre>{{ output }}</pre>
+            {% endif %}
+        </section>
+    </div>
+
+    <script>
+        // JavaScript logic remains unchanged
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Element References ---
+            const fetchVmsBtn = document.getElementById('fetch-vms-btn');
+            const startSelectedBtn = document.getElementById('start-selected-btn');
+            const vmList = document.getElementById('vm-list');
+            const hiddenIpInput = document.getElementById('ips');
+            const ipDisplay = document.getElementById('selected-ips-display');
+            const vmStatusMessage = document.getElementById('vm-status-message');
+            const commandSelect = document.getElementById('command');
+            const extraInputContainer = document.getElementById('extra-input-container');
+            const extraInputField = document.getElementById('extra-input');
+            const extraInputLabel = document.getElementById('extra-input-label');
+            
+            let pollingInterval = null;
+            let vmsToWatch = [];
+
+            // --- Main function to fetch and render the VM list ---
+            async function fetchAndRenderVms() {
+                if (!pollingInterval) {
+                    vmStatusMessage.textContent = 'Fetching...';
+                    vmStatusMessage.className = 'status-message';
+                }
+                fetchVmsBtn.disabled = true;
+
+                try {
+                    const response = await fetch('/get-vms');
+                    const data = await response.json();
+                    if (response.status !== 200) throw new Error(data.error || 'Unknown error');
+                    
+                    const currentlySelected = new Set(
+                        Array.from(document.querySelectorAll('.vm-checkbox:checked')).map(cb => cb.dataset.name)
+                    );
+                    const selectedIpsFromHidden = new Set(
+                        hiddenIpInput.value
+                            .split('\n')
+                            .map(s => s.trim())
+                            .filter(Boolean)
+                    );
+                    
+                    vmList.innerHTML = '';
+                    if (data.length === 0) {
+                         vmStatusMessage.textContent = 'No VMs found matching the filter.';
+                         return;
+                    }
+
+                    let stillStarting = false;
+                    data.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true})).forEach(vm => {
+                        const isRunning = vm.status === 'RUNNING';
+                        const ipAddress = vm.networkInterfaces && vm.networkInterfaces[0].accessConfigs ? vm.networkInterfaces[0].accessConfigs[0].natIP : null;
+                        
+                        const li = document.createElement('li');
+                        li.className = 'vm-item';
+                        const isChecked = (currentlySelected.has(vm.name) || (ipAddress && selectedIpsFromHidden.has(ipAddress))) ? 'checked' : '';
+                        li.innerHTML = `
+                            <input type="checkbox" class="vm-checkbox" data-name="${vm.name}" data-zone="${vm.zone}" data-ip="${ipAddress || ''}" data-status="${vm.status}" ${isChecked}>
+                            <div class="status-indicator status-${vm.status.toLowerCase()}"></div>
+                            <span class="vm-name">${vm.name}</span>
+                            <span class="vm-ip">${ipAddress || 'No external IP'}</span>
+                            <span>(${vm.status})</span>
+                        `;
+                        vmList.appendChild(li);
+
+                        if (vmsToWatch.includes(vm.name) && !(isRunning && ipAddress)) {
+                            stillStarting = true;
+                        }
+                    });
+                    
+                    if (pollingInterval && !stillStarting) {
+                        clearInterval(pollingInterval);
+                        pollingInterval = null;
+                        vmsToWatch = [];
+                        vmStatusMessage.textContent = 'All selected VMs are running and have an IP address.';
+                        vmStatusMessage.className = 'status-message status-success';
+                    } else if (!pollingInterval) {
+                         vmStatusMessage.textContent = '';
+                    }
+                    
+                    updateUiState();
+
+                } catch (error) {
+                    vmStatusMessage.textContent = `Error: ${error.message}`;
+                    vmStatusMessage.className = 'status-message status-error';
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                } finally {
+                    fetchVmsBtn.disabled = false;
+                }
+            }
+
+            function updateUiState() {
+                const selectedCheckboxes = Array.from(document.querySelectorAll('.vm-checkbox:checked'));
+                
+                const selectedIps = selectedCheckboxes
+                    .filter(cb => cb.dataset.status === 'RUNNING' && cb.dataset.ip)
+                    .map(cb => cb.dataset.ip);
+                
+                hiddenIpInput.value = selectedIps.join('\n');
+                ipDisplay.textContent = selectedIps.length > 0 ? selectedIps.join(', ') : 'Select active VMs...';
+
+                const selectedTerminated = selectedCheckboxes.filter(cb => cb.dataset.status === 'TERMINATED');
+                startSelectedBtn.disabled = selectedTerminated.length === 0;
+            }
+
+            async function startSelectedVms() {
+                const vmsToStart = Array.from(document.querySelectorAll('.vm-checkbox:checked'))
+                    .filter(cb => cb.dataset.status === 'TERMINATED')
+                    .map(cb => ({ name: cb.dataset.name, zone: cb.dataset.zone.split('/').pop() }));
+
+                if (vmsToStart.length === 0) return;
+
+                startSelectedBtn.disabled = true;
+                vmStatusMessage.textContent = `Start command for ${vmsToStart.length} VM(s) sent. Refreshing status...`;
+                vmStatusMessage.className = 'status-message';
+                
+                vmsToWatch = vmsToStart.map(vm => vm.name);
+
+                try {
+                    const response = await fetch('/start-vms', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ vms: vmsToStart })
+                    });
+                    const data = await response.json();
+                    if (response.status !== 200) throw new Error(data.error);
+
+                    await fetchAndRenderVms();
+                    if (vmsToWatch.length > 0) {
+                         pollingInterval = setInterval(fetchAndRenderVms, 5000);
+                    }
+                } catch (error) {
+                    vmStatusMessage.textContent = `Error starting VMs: ${error.message}`;
+                    vmStatusMessage.className = 'status-message status-error';
+                    vmsToWatch = [];
+                }
+            }
+            
+            fetchVmsBtn.addEventListener('click', fetchAndRenderVms);
+            startSelectedBtn.addEventListener('click', startSelectedVms);
+            vmList.addEventListener('change', updateUiState);
+
+            function toggleExtraInput() {
+                const selectedOption = commandSelect.options[commandSelect.selectedIndex];
+                const requiresInput = selectedOption.getAttribute('data-requires-input') === 'true';
+                if (requiresInput) {
+                    extraInputLabel.textContent = selectedOption.getAttribute('data-prompt');
+                    extraInputContainer.style.display = 'flex';
+                    extraInputField.required = true;
+                } else {
+                    extraInputContainer.style.display = 'none';
+                    extraInputField.required = false;
+                    extraInputField.value = '';
+                }
+            }
+            commandSelect.addEventListener('change', toggleExtraInput);
+            toggleExtraInput();
+
+            // Auto-fetch VM list on page load
+            fetchAndRenderVms();
+
+            // Bevestiging voor risicovolle acties
+            const formEl = document.querySelector('form');
+            formEl.addEventListener('submit', function(e) {
+                const selectedOption = commandSelect.options[commandSelect.selectedIndex];
+                const label = selectedOption.textContent.trim();
+                if (label === 'Shutdown Fabric Studio and VM' || label === 'Fabric Studio Upgrade') {
+                    if (!confirm('Are you sure?')) {
+                        e.preventDefault();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
