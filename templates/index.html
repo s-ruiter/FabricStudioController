@@ -14,33 +14,29 @@
 
         <!-- GCloud CLI Status -->
         <div class="gcloud-status">
-            <h3>🔧 Google Cloud CLI Status</h3>
+            <span class="gcloud-title">🔧 Google Cloud CLI Status:</span>
             {% if gcloud_status.errors %}
-                <div class="status-error">
-                    <strong>❌ Issues Found:</strong>
-                    <ul>
-                        {% for error in gcloud_status.errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                    <p><strong>⚠️ VM management features may not work properly.</strong></p>
-                </div>
+                <span class="status-error-inline">
+                    <strong>❌ Issues:</strong>
+                    {% for error in gcloud_status.errors %}
+                        {{ error }}{% if not loop.last %}; {% endif %}
+                    {% endfor %}
+                    <strong> ⚠️ VM features may not work.</strong>
+                </span>
             {% elif gcloud_status.warnings %}
-                <div class="status-warning">
+                <span class="status-warning-inline">
                     <strong>⚠️ Warnings:</strong>
-                    <ul>
-                        {% for warning in gcloud_status.warnings %}
-                            <li>{{ warning }}</li>
-                        {% endfor %}
-                    </ul>
-                    <p><strong>VM management features may not work properly.</strong></p>
-                </div>
+                    {% for warning in gcloud_status.warnings %}
+                        {{ warning }}{% if not loop.last %}; {% endif %}
+                    {% endfor %}
+                    <strong> VM features may not work properly.</strong>
+                </span>
             {% else %}
-                <div class="status-success">
-                    <strong>✅ gcloud CLI is properly configured</strong>
-                    <p><strong>Account:</strong> {{ gcloud_status.account }}</p>
-                    <p><strong>Project:</strong> {{ gcloud_status.project }}</p>
-                </div>
+                <span class="status-success-inline">
+                    <strong>✅ Configured</strong> | 
+                    <strong>Account:</strong> {{ gcloud_status.account }} | 
+                    <strong>Project:</strong> {{ gcloud_status.project }}
+                </span>
             {% endif %}
         </div>
 

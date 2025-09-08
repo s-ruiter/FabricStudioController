@@ -73,35 +73,46 @@ section + section { margin-top: 16px; }
 
 /* GCloud Status Section */
 .gcloud-status {
-  margin-bottom: 20px;
-  padding: 16px;
+  margin-bottom: 16px;
+  padding: 8px 12px;
   background: rgba(0,0,0,0.08);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.3;
 }
 
-.gcloud-status h3 {
-  margin: 0 0 12px 0;
-  font-size: 1.1rem;
+.gcloud-title {
+  font-weight: 600;
   color: var(--text-primary);
+  margin-right: 8px;
 }
 
-.gcloud-status ul {
-  margin: 8px 0;
-  padding-left: 20px;
+.status-error-inline {
+  color: #ffd3d6;
+  background-color: rgba(255, 107, 107, 0.15);
+  border: 1px solid var(--status-red);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
 }
 
-.gcloud-status li {
-  margin: 4px 0;
-}
-
-.status-warning {
+.status-warning-inline {
   color: #ffd166;
   background-color: rgba(255, 209, 102, 0.15);
   border: 1px solid var(--status-yellow);
-  padding: 12px;
-  border-radius: 8px;
-  margin-top: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.status-success-inline {
+  color: #d7ffe8;
+  background-color: rgba(61, 220, 151, 0.15);
+  border: 1px solid var(--status-green);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
 }
 
 form { display: flex; flex-direction: column; gap: 14px; }
