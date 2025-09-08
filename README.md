@@ -134,12 +134,19 @@ See [COMMANDS.md](COMMANDS.md) for detailed documentation on command configurati
 ## Configuration
 
 ### VM Filter
-The app filters VMs by name pattern: `sru-fstudio-faz*`
+The app includes a user-configurable VM filter in the web interface:
 
-To modify the filter, edit `app.py`:
-```python
-'--filter=name~^sru-fstudio-faz',  # Change this pattern
-```
+- **Default Filter**: `sru-fstudio-faz` (searches for VMs containing this text)
+- **User-Friendly**: Simply type text to search in VM names
+- **Advanced Support**: Supports full gcloud filter syntax for power users
+- **Real-time**: Filter is applied when clicking "Fetch VM Status"
+
+#### Filter Usage:
+- **Simple Text**: Type `workshop` to find VMs containing "workshop"
+- **Advanced Syntax**: Use `status=RUNNING` to show only running VMs
+- **Pattern Matching**: Use `name~^prod` to find VMs starting with "prod"
+
+The filter input field is located in the VM Management section on the right side of the interface.
 
 ### Commands
 Commands are now managed through `commands.json` - see the [Available Commands](#available-commands) section above for details.
