@@ -97,7 +97,7 @@ section + section { margin-top: 16px; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .left-col, .right-col {
@@ -105,6 +105,19 @@ section + section { margin-top: 16px; }
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.left-col form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 16px;
+}
+
+.left-col form button[type="submit"] {
+  margin-top: auto;
 }
 
 .output-section { margin-top: 20px; }
