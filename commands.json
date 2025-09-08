@@ -1,0 +1,27 @@
+{
+  "Start FAZ workshop POC": {
+    "command": "runtime fabric install --power-on-vms FAZ-Workshop2025",
+    "responses": {},
+    "disconnect": false
+  },
+  "Stop FAZ workshop POC": {
+    "command": "runtime fabric uninstall",
+    "responses": {}
+  },
+  "Shutdown Fabric Studio and VM": {
+    "command": "system execute shutdown --no-interactive",
+    "responses": {}
+  },
+  "Fabric Studio Upgrade": {
+    "command": "system execute upgrade --no-interactive",
+    "responses": {},
+    "disconnect": true
+  },
+  "Change guest user password": {
+    "command": "execute password guest {extra_input}",
+    "requires_extra_input": true,
+    "prompt": "New password for guest user:",
+    "responses": {},
+    "disconnect": false
+  }
+}

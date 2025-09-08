@@ -9,34 +9,26 @@ from invoke.exceptions import CommandTimedOut
 # --- Flask Application Setup ---
 app = Flask(__name__)
 
-# --- Define your commands here ---
-COMMAND_OPTIONS = {
-    'Start FAZ workshop POC': {
-        'command': 'runtime fabric install --power-on-vms FAZ-Workshop2025',
-        'responses': {},
-        'disconnect': False
-    },
-    'Stop FAZ workshop POC': {
-        'command': 'runtime fabric uninstall',
-        'responses': {}
-    },
-    'Shutdown Fabric Studio and VM': {
-        'command': 'system execute shutdown --no-interactive',
-        'responses': {}
-    },
-    'Fabric Studio Upgrade': {
-        'command': 'system execute upgrade --no-interactive',
-        'responses': {},
-        'disconnect': True
-    },
-    'Change guest user password': {
-        'command': 'execute password guest {extra_input}',
-        'requires_extra_input': True,
-        'prompt': 'New password for guest user:',
-        'responses': {},
-        'disconnect': False
-    }
-}
+# --- Load commands from configuration file ---
+def load_commands():
+    """Load commands from commands.json file."""
+    try:
+        with open('commands.json', 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print("⚠️  commands.json not found, using default commands")
+        return {
+            'Start FAZ workshop POC': {
+                'command': 'runtime fabric install --power-on-vms FAZ-Workshop2025',
+                'responses': {},
+                'disconnect': False
+            }
+        }
+    except json.JSONDecodeError as e:
+        print(f"❌ Error parsing commands.json: {e}")
+        return {}
+
+COMMAND_OPTIONS = load_commands()
 
 # --- API Endpoints for Google Cloud ---
 
