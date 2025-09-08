@@ -44,9 +44,12 @@ COMMAND_OPTIONS = {
 def get_gcp_vms():
     """Fetch a detailed list of VMs including name, zone, status and IP."""
     try:
+        # Get filter from query parameter, default to current filter
+        filter_value = request.args.get('filter', 'name~^sru-fstudio-faz')
+        
         gcloud_command = [
             'gcloud', 'compute', 'instances', 'list',
-            '--filter=name~^sru-fstudio-faz',
+            f'--filter={filter_value}',
             '--format=json(name,zone,status,networkInterfaces[0].accessConfigs[0].natIP)'
         ]
         result = subprocess.run(gcloud_command, capture_output=True, text=True, check=True, timeout=30)
