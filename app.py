@@ -125,6 +125,8 @@ def execute_remote_command(hosts, username, password, command_string):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     output = ""
+    gcloud_status = check_gcloud_cli()
+    
     if request.method == 'POST':
         ips_string = request.form.get('ips')
         username = request.form.get('username')
@@ -137,13 +139,13 @@ def index():
             extra_input = request.form.get('extra_input')
             if not extra_input:
                 output = "Error: This command requires additional input."
-                return render_template('index.html', output=output, commands=COMMAND_OPTIONS)
+                return render_template('index.html', output=output, commands=COMMAND_OPTIONS, gcloud_status=gcloud_status)
             final_command = command_template.format(extra_input=extra_input)
         if not all([hosts, username, password, command_template]):
             output = "Error: Please fill in all fields."
         else:
             output = execute_remote_command(hosts, username, password, final_command)
-    return render_template('index.html', output=output, commands=COMMAND_OPTIONS)
+    return render_template('index.html', output=output, commands=COMMAND_OPTIONS, gcloud_status=gcloud_status)
 
 @app.route('/favicon.ico')
 def favicon():
@@ -152,51 +154,74 @@ def favicon():
 # --- GCloud CLI Check ---
 def check_gcloud_cli():
     """Check if gcloud CLI is installed and working."""
+    status = {
+        'installed': False,
+        'authenticated': False,
+        'project_set': False,
+        'account': '',
+        'project': '',
+        'errors': [],
+        'warnings': []
+    }
+    
     try:
         result = subprocess.run(['gcloud', '--version'], capture_output=True, text=True, timeout=10)
         if result.returncode != 0:
-            print("❌ Error: gcloud CLI is not working properly")
-            print(f"Error: {result.stderr}")
-            return False
+            status['errors'].append(f"gcloud CLI is not working properly: {result.stderr}")
+            return status
+        
+        status['installed'] = True
         
         # Check if user is authenticated
         auth_result = subprocess.run(['gcloud', 'auth', 'list', '--filter=status:ACTIVE', '--format=value(account)'], 
                                    capture_output=True, text=True, timeout=10)
         if not auth_result.stdout.strip():
-            print("❌ Warning: No active gcloud authentication found")
-            print("Please run: gcloud auth login")
-            return False
+            status['warnings'].append("No active gcloud authentication found. Please run: gcloud auth login")
+        else:
+            status['authenticated'] = True
+            status['account'] = auth_result.stdout.strip()
             
         # Check if project is set
         project_result = subprocess.run(['gcloud', 'config', 'get-value', 'project'], 
                                       capture_output=True, text=True, timeout=10)
         if not project_result.stdout.strip():
-            print("❌ Warning: No gcloud project configured")
-            print("Please run: gcloud config set project YOUR_PROJECT_ID")
-            return False
+            status['warnings'].append("No gcloud project configured. Please run: gcloud config set project YOUR_PROJECT_ID")
+        else:
+            status['project_set'] = True
+            status['project'] = project_result.stdout.strip()
             
-        print("✅ gcloud CLI is installed and configured")
-        print(f"   Active account: {auth_result.stdout.strip()}")
-        print(f"   Project: {project_result.stdout.strip()}")
-        return True
+        return status
         
     except FileNotFoundError:
-        print("❌ Error: gcloud CLI is not installed")
-        print("Please install Google Cloud CLI: https://cloud.google.com/sdk/docs/install")
-        return False
+        status['errors'].append("gcloud CLI is not installed. Please install Google Cloud CLI: https://cloud.google.com/sdk/docs/install")
+        return status
     except subprocess.TimeoutExpired:
-        print("❌ Error: gcloud CLI check timed out")
-        return False
+        status['errors'].append("gcloud CLI check timed out")
+        return status
     except Exception as e:
-        print(f"❌ Error checking gcloud CLI: {e}")
-        return False
+        status['errors'].append(f"Error checking gcloud CLI: {e}")
+        return status
 
 # --- Applicatie Startpunt ---
 if __name__ == '__main__':
     print("🔍 Checking gcloud CLI...")
-    if not check_gcloud_cli():
+    gcloud_status = check_gcloud_cli()
+    
+    if gcloud_status['errors']:
+        print("❌ gcloud CLI issues found:")
+        for error in gcloud_status['errors']:
+            print(f"   {error}")
         print("\n⚠️  The application will start but VM management features may not work.")
         print("   Please fix the gcloud CLI issues above before using VM features.\n")
+    elif gcloud_status['warnings']:
+        print("⚠️  gcloud CLI warnings:")
+        for warning in gcloud_status['warnings']:
+            print(f"   {warning}")
+        print("\n⚠️  VM management features may not work properly.\n")
+    else:
+        print("✅ gcloud CLI is installed and configured")
+        print(f"   Active account: {gcloud_status['account']}")
+        print(f"   Project: {gcloud_status['project']}\n")
     
     app.run(debug=True)
 

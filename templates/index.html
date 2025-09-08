@@ -12,6 +12,38 @@
     <div class="container">
         <h1>FortiAnalyzer Workshop Controller</h1>
 
+        <!-- GCloud CLI Status -->
+        <div class="gcloud-status">
+            <h3>🔧 Google Cloud CLI Status</h3>
+            {% if gcloud_status.errors %}
+                <div class="status-error">
+                    <strong>❌ Issues Found:</strong>
+                    <ul>
+                        {% for error in gcloud_status.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    <p><strong>⚠️ VM management features may not work properly.</strong></p>
+                </div>
+            {% elif gcloud_status.warnings %}
+                <div class="status-warning">
+                    <strong>⚠️ Warnings:</strong>
+                    <ul>
+                        {% for warning in gcloud_status.warnings %}
+                            <li>{{ warning }}</li>
+                        {% endfor %}
+                    </ul>
+                    <p><strong>VM management features may not work properly.</strong></p>
+                </div>
+            {% else %}
+                <div class="status-success">
+                    <strong>✅ gcloud CLI is properly configured</strong>
+                    <p><strong>Account:</strong> {{ gcloud_status.account }}</p>
+                    <p><strong>Project:</strong> {{ gcloud_status.project }}</p>
+                </div>
+            {% endif %}
+        </div>
+
         <div class="grid-2col">
             <section class="left-col">
                 <form method="post">
