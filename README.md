@@ -30,14 +30,6 @@ gcloud auth login
 gcloud config set project YOUR_PROJECT_ID
 ```
 
-### 3. Google Cloud Service Account
-1. Create a service account in Google Cloud Console
-2. Download the credentials JSON file
-3. Place it as `gcp-credentials.json` in the project root
-4. Set the environment variable:
-```bash
-export GOOGLE_APPLICATION_CREDENTIALS="path/to/gcp-credentials.json"
-```
 
 ## Installation
 
@@ -52,11 +44,6 @@ cd FabricStudioController
 pip install -r requirements.txt
 ```
 
-3. **Add your Google Cloud credentials**
-```bash
-# Place your service account JSON file in the project root
-cp /path/to/your/credentials.json gcp-credentials.json
-```
 
 ## Usage
 
@@ -109,7 +96,6 @@ COMMAND_OPTIONS = {
 FabricStudioController/
 ├── app.py                 # Flask application
 ├── requirements.txt       # Python dependencies
-├── gcp-credentials.json   # Google Cloud credentials (not in repo)
 ├── static/
 │   ├── style.css         # Modern dark theme
 │   └── favicon.ico       # Application icon
@@ -119,9 +105,8 @@ FabricStudioController/
 
 ## Security Notes
 
-- **Credentials**: Never commit `gcp-credentials.json` to version control
 - **Network**: The app runs on localhost by default
-- **Permissions**: Ensure your service account has necessary VM management permissions
+- **Permissions**: Ensure your gcloud CLI has necessary VM management permissions
 
 ## Troubleshooting
 
@@ -133,7 +118,7 @@ FabricStudioController/
 
 2. **"Authentication failed"**
    - Run `gcloud auth login`
-   - Set `GOOGLE_APPLICATION_CREDENTIALS` environment variable
+   - Verify your project is set: `gcloud config get-value project`
 
 3. **"No VMs found"**
    - Check your project ID: `gcloud config get-value project`
