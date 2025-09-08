@@ -1,4 +1,16 @@
 {
+  "_comment": "FabricStudio POC Controller - Commands Configuration",
+  "_description": "This file defines the available commands in the dropdown menu. Each command can have the following properties:",
+  "_properties": {
+    "command": "The actual command to execute on the remote VM (required)",
+    "responses": "Dictionary of response patterns for interactive commands (optional)",
+    "disconnect": "Set to true if the command will disconnect/reboot (optional)",
+    "requires_extra_input": "Set to true if the command needs additional user input (optional)",
+    "prompt": "The prompt text to show when requires_extra_input is true (optional)",
+    "warning": "Set to true if the command should show 'Are you sure?' confirmation (optional)"
+  },
+  "_usage": "To add a new command, add a new entry with a unique name as the key. To modify existing commands, edit the properties. Restart the application after making changes.",
+  "_documentation": "See COMMANDS.md for detailed examples and documentation.",
   "Start FAZ workshop POC": {
     "command": "runtime fabric install --power-on-vms FAZ-Workshop2025",
     "responses": {},
