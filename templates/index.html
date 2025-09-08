@@ -76,7 +76,8 @@
                     <div class="vm-controls">
                         <div class="filter-control">
                             <label for="vm-filter">Filter VMs:</label>
-                            <input type="text" id="vm-filter" name="vm-filter" value="name~^sru-fstudio-faz" placeholder="e.g., name~^sru-fstudio-faz">
+                            <input type="text" id="vm-filter" name="vm-filter" value="sru-fstudio-faz" placeholder="e.g., workshop, test, or name~pattern">
+                            <small class="filter-help">Enter text to search in VM names, or use gcloud filter syntax (name~pattern, status=RUNNING, etc.)</small>
                         </div>
                         <button type="button" id="fetch-vms-btn" class="action-button">Fetch VM Status</button>
                         <button type="button" id="start-selected-btn" class="action-button" disabled>Start Selected VMs</button>
@@ -123,7 +124,20 @@
                 fetchVmsBtn.disabled = true;
 
                 try {
-                    const filterValue = vmFilterInput.value.trim() || 'name~^sru-fstudio-faz';
+                    const userInput = vmFilterInput.value.trim();
+                    let filterValue;
+                    
+                    if (!userInput) {
+                        // Default filter if nothing entered
+                        filterValue = 'name~^sru-fstudio-faz';
+                    } else if (userInput.includes('~') || userInput.includes('=') || userInput.includes(':')) {
+                        // User entered a gcloud filter format, use as-is
+                        filterValue = userInput;
+                    } else {
+                        // User entered simple text, convert to name filter
+                        filterValue = `name~${userInput}`;
+                    }
+                    
                     const response = await fetch(`/get-vms?filter=${encodeURIComponent(filterValue)}`);
                     const data = await response.json();
                     if (response.status !== 200) throw new Error(data.error || 'Unknown error');
