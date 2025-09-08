@@ -249,8 +249,7 @@
             commandSelect.addEventListener('change', toggleExtraInput);
             toggleExtraInput();
 
-            // Auto-fetch VM list on page load
-            fetchAndRenderVms();
+            // VM list will be loaded when user clicks "Fetch VM Status" button
 
             // Bevestiging voor risicovolle acties
             const formEl = document.querySelector('form');
