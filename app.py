@@ -81,10 +81,11 @@ def start_gcp_vms():
 def execute_remote_command(hosts, username, password, command_string):
     output_buffer = io.StringIO()
     selected_command_info = None
-    for info in COMMAND_OPTIONS.values():
-        if command_string.startswith(info['command'].split('{')[0]):
-            selected_command_info = info
-            break
+    for key, info in COMMAND_OPTIONS.items():
+        if not key.startswith('_') and isinstance(info, dict) and 'command' in info:
+            if command_string.startswith(info['command'].split('{')[0]):
+                selected_command_info = info
+                break
     if not selected_command_info:
         output_buffer.write(f"❌ Error: The selected command '{command_string}' could not be found.")
         return output_buffer.getvalue()
@@ -129,7 +130,7 @@ def index():
         command_template = request.form.get('command')
         hosts = [ip.strip() for ip in ips_string.splitlines() if ip.strip()]
         final_command = command_template
-        selected_command_info = next((info for info in COMMAND_OPTIONS.values() if info['command'] == command_template), None)
+        selected_command_info = next((info for key, info in COMMAND_OPTIONS.items() if not key.startswith('_') and isinstance(info, dict) and info.get('command') == command_template), None)
         if selected_command_info and selected_command_info.get('requires_extra_input'):
             extra_input = request.form.get('extra_input')
             if not extra_input:
