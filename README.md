@@ -144,15 +144,13 @@ The default VM filter can be configured in `commands.json` under the `_config` s
 ```json
 {
   "_config": {
-    "default_vm_filter": "sru-fstudio-faz",
-    "default_vm_filter_placeholder": "e.g., workshop, test, faz"
+    "default_vm_filter": "sru-fstudio-faz"
   }
 }
 ```
 
 **Configuration Options:**
 - `default_vm_filter`: The default filter text used when no custom filter is entered
-- `default_vm_filter_placeholder`: Help text shown in the filter input field
 
 #### Filter Usage in Web Interface
 
@@ -183,8 +181,7 @@ To change the default filter for your environment:
    ```json
    {
      "_config": {
-       "default_vm_filter": "your-custom-filter",
-       "default_vm_filter_placeholder": "e.g., your, custom, examples"
+       "default_vm_filter": "your-custom-filter"
      }
    }
    ```
