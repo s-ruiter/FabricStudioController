@@ -133,23 +133,121 @@ See [COMMANDS.md](COMMANDS.md) for detailed documentation on command configurati
 
 ## Configuration
 
-### VM Filter
-The app includes a user-configurable VM filter in the web interface:
+### VM Filter Configuration
 
-- **Default Filter**: `sru-fstudio-faz` (searches for VMs containing this text)
-- **User-Friendly**: Simply type text to search in VM names
-- **Advanced Support**: Supports full gcloud filter syntax for power users
-- **Real-time**: Filter is applied when clicking "Fetch VM Status"
+The application includes a powerful and configurable VM filtering system that can be customized both through the web interface and configuration files.
 
-#### Filter Usage:
-- **Simple Text**: Type `workshop` to find VMs containing "workshop"
-- **Advanced Syntax**: Use `status=RUNNING` to show only running VMs
-- **Pattern Matching**: Use `name~^prod` to find VMs starting with "prod"
+#### Default Filter Settings
 
-The filter input field is located in the VM Management section on the right side of the interface.
+The default VM filter can be configured in `commands.json` under the `_config` section:
 
-### Commands
-Commands are now managed through `commands.json` - see the [Available Commands](#available-commands) section above for details.
+```json
+{
+  "_config": {
+    "default_vm_filter": "sru-fstudio-faz",
+    "default_vm_filter_placeholder": "e.g., workshop, test, faz"
+  }
+}
+```
+
+**Configuration Options:**
+- `default_vm_filter`: The default filter text used when no custom filter is entered
+- `default_vm_filter_placeholder`: Help text shown in the filter input field
+
+#### Filter Usage in Web Interface
+
+The VM filter is located in the VM Management section (right column) and supports multiple input formats:
+
+**Simple Text Search:**
+- Type `workshop` to find VMs containing "workshop"
+- Type `test` to find VMs containing "test"
+- The app automatically converts simple text to `name~text` format
+
+**Advanced gcloud Filter Syntax:**
+- `status=RUNNING` - Show only running VMs
+- `name~^prod` - Find VMs starting with "prod"
+- `zone:us-central1-a` - Filter by specific zone
+- `labels.environment=production` - Filter by labels
+- `status=RUNNING AND name~workshop` - Combine multiple conditions
+
+**Real-time Filtering:**
+- Filter is applied when clicking "Fetch VM Status"
+- Results update automatically based on your filter criteria
+- Empty filter uses the configured default filter
+
+#### Customizing the Default Filter
+
+To change the default filter for your environment:
+
+1. **Edit `commands.json`:**
+   ```json
+   {
+     "_config": {
+       "default_vm_filter": "your-custom-filter",
+       "default_vm_filter_placeholder": "e.g., your, custom, examples"
+     }
+   }
+   ```
+
+2. **Restart the application** (if running locally) or the changes will take effect immediately
+
+3. **Examples of common filters:**
+   - `workshop` - For workshop environments
+   - `prod` - For production VMs
+   - `test-` - For VMs starting with "test-"
+   - `status=RUNNING` - Only running VMs
+
+### Commands Configuration
+
+Commands are managed through `commands.json` - see the [Available Commands](#available-commands) section above for details.
+
+#### Advanced Command Configuration
+
+The `commands.json` file supports extensive configuration options:
+
+**Basic Command:**
+```json
+{
+  "Your Command Name": {
+    "command": "system status",
+    "responses": {},
+    "disconnect": false
+  }
+}
+```
+
+**Interactive Command with User Input:**
+```json
+{
+  "Change Password": {
+    "command": "execute password admin {extra_input}",
+    "requires_extra_input": true,
+    "prompt": "Enter new admin password:",
+    "responses": {"Password:": "{extra_input}"},
+    "disconnect": false
+  }
+}
+```
+
+**Dangerous Command with Confirmation:**
+```json
+{
+  "Shutdown System": {
+    "command": "system execute shutdown --no-interactive",
+    "responses": {},
+    "warning": true,
+    "disconnect": true
+  }
+}
+```
+
+**Command Properties:**
+- `command`: The SSH command to execute (required)
+- `responses`: Interactive response patterns (optional)
+- `disconnect`: Whether command disconnects/reboots VM (optional)
+- `requires_extra_input`: Whether command needs user input (optional)
+- `prompt`: Prompt text for user input (optional)
+- `warning`: Whether to show confirmation dialog (optional)
 
 ## Deployment to Another Machine
 
