@@ -79,7 +79,7 @@
                         <div class="filter-section">
                             <div class="filter-control">
                                 <label for="vm-filter">Filter VMs:</label>
-                                <input type="text" id="vm-filter" name="vm-filter" value="sru-fstudio-faz" placeholder="e.g., workshop, test, faz">
+                                <input type="text" id="vm-filter" name="vm-filter" value="{{ config.default_vm_filter }}" placeholder="{{ config.default_vm_filter_placeholder }}">
                                 <small class="filter-help">Enter text to search in VM names</small>
                             </div>
                         </div>
@@ -137,7 +137,7 @@
                     
                     if (!userInput) {
                         // Default filter if nothing entered
-                        filterValue = 'name~^sru-fstudio-faz';
+                        filterValue = 'name~^{{ config.default_vm_filter }}';
                     } else if (userInput.includes('~') || userInput.includes('=') || userInput.includes(':')) {
                         // User entered a gcloud filter format, use as-is
                         filterValue = userInput;

@@ -30,14 +30,30 @@ def load_commands():
 
 COMMAND_OPTIONS = load_commands()
 
+# Extract configuration from commands file
+def get_config():
+    """Extract configuration from commands.json file."""
+    config = {
+        'default_vm_filter': 'sru-fstudio-faz',
+        'default_vm_filter_placeholder': 'e.g., workshop, test, faz'
+    }
+    
+    if '_config' in COMMAND_OPTIONS:
+        config.update(COMMAND_OPTIONS['_config'])
+    
+    return config
+
+CONFIG = get_config()
+
 # --- API Endpoints for Google Cloud ---
 
 @app.route('/get-vms')
 def get_gcp_vms():
     """Fetch a detailed list of VMs including name, zone, status and IP."""
     try:
-        # Get filter from query parameter, default to current filter
-        filter_value = request.args.get('filter', 'name~^sru-fstudio-faz')
+        # Get filter from query parameter, default to configured filter
+        default_filter = f"name~^{CONFIG['default_vm_filter']}"
+        filter_value = request.args.get('filter', default_filter)
         
         gcloud_command = [
             'gcloud', 'compute', 'instances', 'list',
@@ -135,13 +151,13 @@ def index():
             extra_input = request.form.get('extra_input')
             if not extra_input:
                 output = "Error: This command requires additional input."
-                return render_template('index.html', output=output, commands=COMMAND_OPTIONS, gcloud_status=gcloud_status)
+                return render_template('index.html', output=output, commands=COMMAND_OPTIONS, gcloud_status=gcloud_status, config=CONFIG)
             final_command = command_template.format(extra_input=extra_input)
         if not all([hosts, username, password, command_template]):
             output = "Error: Please fill in all fields."
         else:
             output = execute_remote_command(hosts, username, password, final_command)
-    return render_template('index.html', output=output, commands=COMMAND_OPTIONS, gcloud_status=gcloud_status)
+    return render_template('index.html', output=output, commands=COMMAND_OPTIONS, gcloud_status=gcloud_status, config=CONFIG)
 
 @app.route('/favicon.ico')
 def favicon():

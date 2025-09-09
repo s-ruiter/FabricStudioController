@@ -11,6 +11,10 @@
   },
   "_usage": "To add a new command, add a new entry with a unique name as the key. To modify existing commands, edit the properties. Restart the application after making changes.",
   "_documentation": "See COMMANDS.md for detailed examples and documentation.",
+  "_config": {
+    "default_vm_filter": "sru-fstudio-faz",
+    "default_vm_filter_placeholder": "e.g., workshop, test, faz"
+  },
   "Start FAZ workshop POC": {
     "command": "runtime fabric install --power-on-vms FAZ-Workshop2025",
     "responses": {},
