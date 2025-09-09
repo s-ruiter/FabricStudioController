@@ -57,62 +57,6 @@
             margin-bottom: 20px;
         }
         
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            background: var(--container-bg);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--input-bg);
-            border-color: var(--accent);
-        }
-        
-        .btn-success {
-            background: var(--status-green);
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background: #2bc484;
-        }
-        
-        .btn-danger {
-            background: var(--status-red);
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background: #ff5252;
-        }
-        
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
         
         .editor-wrapper {
             display: flex;
@@ -230,17 +174,14 @@
         <div id="status-message" class="status-message" style="display: none;"></div>
 
         <div class="editor-actions">
-            <button id="save-btn" class="btn btn-success" disabled>
+            <button id="save-btn" class="action-button primary" disabled>
                 💾 Save Changes
             </button>
-            <button id="validate-btn" class="btn btn-secondary">
+            <button id="validate-btn" class="action-button secondary">
                 ✅ Validate JSON
             </button>
-            <button id="format-btn" class="btn btn-secondary">
+            <button id="format-btn" class="action-button secondary">
                 🎨 Format JSON
-            </button>
-            <button id="reset-btn" class="btn btn-danger">
-                🔄 Reset to Original
             </button>
         </div>
 
@@ -259,7 +200,6 @@
                     <li><strong>Save Changes:</strong> Save your changes (creates a backup automatically)</li>
                     <li><strong>Validate JSON:</strong> Check if your JSON is valid before saving</li>
                     <li><strong>Format JSON:</strong> Auto-format the JSON for better readability</li>
-                    <li><strong>Reset to Original:</strong> Discard changes and reload the original file</li>
                 </ul>
                 
                 <p><strong>Important Notes:</strong></p>
@@ -341,7 +281,6 @@
         const saveBtn = document.getElementById('save-btn');
         const validateBtn = document.getElementById('validate-btn');
         const formatBtn = document.getElementById('format-btn');
-        const resetBtn = document.getElementById('reset-btn');
 
         function showStatus(message, type = 'info') {
             statusMessage.textContent = message;
@@ -427,21 +366,11 @@
             }
         }
 
-        function resetToOriginal() {
-            if (hasChanges && !confirm('Are you sure you want to discard your changes?')) {
-                return;
-            }
-            
-            editor.value = originalContent;
-            checkForChanges();
-            showStatus('Reset to original content', 'info');
-        }
 
         // Event listeners
         saveBtn.addEventListener('click', saveChanges);
         validateBtn.addEventListener('click', validateJSON);
         formatBtn.addEventListener('click', formatJSON);
-        resetBtn.addEventListener('click', resetToOriginal);
 
         editor.addEventListener('input', () => {
             checkForChanges();
