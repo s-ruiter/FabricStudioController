@@ -57,7 +57,7 @@
                     <label for="command">Choose a command:</label>
                     <select id="command" name="command" required>
                         {% for display, info in commands.items() %}
-                            {% if not display.startswith('_') %}
+                            {% if not display.startswith('_') and info is mapping %}
                             <option value="{{ info.command }}" 
                                     data-requires-input="{{ 'true' if info.get('requires_extra_input') else 'false' }}"
                                     data-prompt="{{ info.get('prompt', '') }}"
