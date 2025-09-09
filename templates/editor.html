@@ -230,9 +230,6 @@
         <div id="status-message" class="status-message" style="display: none;"></div>
 
         <div class="editor-actions">
-            <button id="load-btn" class="btn btn-primary">
-                📁 Load Current
-            </button>
             <button id="save-btn" class="btn btn-success" disabled>
                 💾 Save Changes
             </button>
@@ -259,7 +256,6 @@
             <div class="help-content">
                 <p><strong>How to use the editor:</strong></p>
                 <ul>
-                    <li><strong>Load Current:</strong> Load the current commands.json file</li>
                     <li><strong>Save Changes:</strong> Save your changes (creates a backup automatically)</li>
                     <li><strong>Validate JSON:</strong> Check if your JSON is valid before saving</li>
                     <li><strong>Format JSON:</strong> Auto-format the JSON for better readability</li>
@@ -281,7 +277,6 @@
                 <p><strong>Configuration Section (_config):</strong></p>
                 <ul>
                     <li><code>default_vm_filter</code>: Default VM filter text used when no custom filter is entered</li>
-                    <li><code>default_vm_filter_placeholder</code>: Placeholder text shown in the VM filter input field</li>
                 </ul>
                 
                 <p><strong>Command Properties:</strong></p>
@@ -343,7 +338,6 @@
 
         const editor = document.getElementById('json-editor');
         const statusMessage = document.getElementById('status-message');
-        const loadBtn = document.getElementById('load-btn');
         const saveBtn = document.getElementById('save-btn');
         const validateBtn = document.getElementById('validate-btn');
         const formatBtn = document.getElementById('format-btn');
@@ -367,9 +361,6 @@
 
         async function loadCurrent() {
             try {
-                loadBtn.disabled = true;
-                loadBtn.textContent = '⏳ Loading...';
-                
                 const response = await fetch('/api/commands');
                 const data = await response.json();
                 
@@ -377,15 +368,11 @@
                     originalContent = data.content;
                     editor.value = data.content;
                     checkForChanges();
-                    showStatus('Commands loaded successfully', 'success');
                 } else {
                     showStatus(`Error loading commands: ${data.error}`, 'error');
                 }
             } catch (error) {
                 showStatus(`Error loading commands: ${error.message}`, 'error');
-            } finally {
-                loadBtn.disabled = false;
-                loadBtn.textContent = '📁 Load Current';
             }
         }
 
@@ -451,7 +438,6 @@
         }
 
         // Event listeners
-        loadBtn.addEventListener('click', loadCurrent);
         saveBtn.addEventListener('click', saveChanges);
         validateBtn.addEventListener('click', validateJSON);
         formatBtn.addEventListener('click', formatJSON);

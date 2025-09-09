@@ -1,52 +1,8 @@
 {
-  "_comment": "FabricStudio POC Controller - Commands Configuration",
-  "_description": "This file defines the available commands in the dropdown menu and application configuration. It contains two main sections: _config for app settings and individual command definitions.",
-  
   "_config": {
-    "description": "Application configuration settings that control default behavior",
-    "default_vm_filter": "sru-fstudio-faz",
+    "default_vm_filter": "sru-fstudio-fazz",
     "default_vm_filter_placeholder": "e.g., workshop, test, faz"
   },
-  
-  "_command_properties": {
-    "description": "Properties available for each command definition",
-    "command": "The actual SSH command to execute on the remote VM (REQUIRED)",
-    "responses": "Dictionary of response patterns for interactive commands (optional) - format: {\"pattern\": \"response\"}",
-    "disconnect": "Set to true if the command will disconnect/reboot the VM (optional, default: false)",
-    "requires_extra_input": "Set to true if the command needs additional user input (optional, default: false)",
-    "prompt": "The prompt text to show when requires_extra_input is true (optional)",
-    "warning": "Set to true if the command should show 'Are you sure?' confirmation (optional, default: false)"
-  },
-  
-  "_usage_instructions": {
-    "adding_commands": "To add a new command, add a new entry with a unique name as the key",
-    "modifying_commands": "To modify existing commands, edit the properties in place",
-    "restart_required": "Restart the application after making changes to see them take effect",
-    "config_changes": "Changes to _config section take effect immediately without restart"
-  },
-  
-  "_examples": {
-    "simple_command": {
-      "command": "system status",
-      "responses": {},
-      "disconnect": false
-    },
-    "interactive_command": {
-      "command": "execute password admin {extra_input}",
-      "requires_extra_input": true,
-      "prompt": "Enter new admin password:",
-      "responses": {"Password:": "{extra_input}"},
-      "disconnect": false
-    },
-    "dangerous_command": {
-      "command": "system execute shutdown --no-interactive",
-      "responses": {},
-      "warning": true,
-      "disconnect": true
-    }
-  },
-  
-  "_documentation": "See COMMANDS.md for detailed examples and advanced configuration options.",
   "Start FAZ workshop POC": {
     "command": "runtime fabric install --power-on-vms FAZ-Workshop2025",
     "responses": {},

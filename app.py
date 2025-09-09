@@ -34,8 +34,7 @@ COMMAND_OPTIONS = load_commands()
 def get_config():
     """Extract configuration from commands.json file."""
     config = {
-        'default_vm_filter': 'sru-fstudio-faz',
-        'default_vm_filter_placeholder': 'e.g., workshop, test, faz'
+        'default_vm_filter': 'sru-fstudio-faz'
     }
     
     if '_config' in COMMAND_OPTIONS:
