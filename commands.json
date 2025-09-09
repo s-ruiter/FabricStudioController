@@ -4,8 +4,8 @@
   
   "_config": {
     "description": "Application configuration settings that control default behavior",
-    "default_vm_filter": "Default VM name filter used when no custom filter is entered (e.g., 'sru-fstudio-faz' searches for VMs containing this text)",
-    "default_vm_filter_placeholder": "Placeholder text shown in the VM filter input field to guide users"
+    "default_vm_filter": "sru-fstudio-faz",
+    "default_vm_filter_placeholder": "e.g., workshop, test, faz"
   },
   
   "_command_properties": {
