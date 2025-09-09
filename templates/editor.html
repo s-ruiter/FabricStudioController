@@ -115,15 +115,16 @@
         }
         
         .editor-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 300px);
+            margin-bottom: 20px;
         }
         
         .editor-panel {
             display: flex;
             flex-direction: column;
+            flex: 1;
         }
         
         .panel-header {
@@ -157,24 +158,6 @@
             box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.2);
         }
         
-        .preview-panel {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .preview-content {
-            flex: 1;
-            padding: 16px;
-            background: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            overflow-y: auto;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            white-space: pre-wrap;
-        }
         
         .status-message {
             padding: 12px 16px;
@@ -229,17 +212,8 @@
         }
         
         @media (max-width: 1200px) {
-            .editor-wrapper {
-                grid-template-columns: 1fr;
-                height: auto;
-            }
-            
             .editor-textarea {
                 min-height: 400px;
-            }
-            
-            .preview-content {
-                min-height: 300px;
             }
         }
     </style>
@@ -278,11 +252,6 @@
                 <div class="panel-header">JSON Editor</div>
                 <textarea id="json-editor" class="editor-textarea" placeholder="Loading commands.json..."></textarea>
             </div>
-            
-            <div class="preview-panel">
-                <div class="panel-header">Preview</div>
-                <div id="preview-content" class="preview-content">Click "Load Current" to see the JSON content</div>
-            </div>
         </div>
 
         <div class="help-section">
@@ -302,7 +271,7 @@
                     <li>Always validate JSON before saving to avoid breaking the application</li>
                     <li>A backup is automatically created when you save changes</li>
                     <li>Changes take effect immediately after saving</li>
-                    <li>Use the preview panel to see how your JSON will look</li>
+                    <li>The editor provides syntax highlighting and error detection</li>
                 </ul>
                 
                 <p><strong>Configuration Section:</strong></p>
@@ -319,7 +288,6 @@
         let hasChanges = false;
 
         const editor = document.getElementById('json-editor');
-        const preview = document.getElementById('preview-content');
         const statusMessage = document.getElementById('status-message');
         const loadBtn = document.getElementById('load-btn');
         const saveBtn = document.getElementById('save-btn');
@@ -337,17 +305,6 @@
             }, 5000);
         }
 
-        function updatePreview() {
-            try {
-                const content = editor.value;
-                const parsed = JSON.parse(content);
-                preview.textContent = JSON.stringify(parsed, null, 2);
-                preview.style.color = 'var(--text-primary)';
-            } catch (e) {
-                preview.textContent = `JSON Error: ${e.message}`;
-                preview.style.color = 'var(--status-red)';
-            }
-        }
 
         function checkForChanges() {
             hasChanges = editor.value !== originalContent;
@@ -365,7 +322,6 @@
                 if (data.success) {
                     originalContent = data.content;
                     editor.value = data.content;
-                    updatePreview();
                     checkForChanges();
                     showStatus('Commands loaded successfully', 'success');
                 } else {
@@ -423,7 +379,6 @@
                 const parsed = JSON.parse(editor.value);
                 const formatted = JSON.stringify(parsed, null, 2);
                 editor.value = formatted;
-                updatePreview();
                 checkForChanges();
                 showStatus('JSON formatted successfully', 'success');
             } catch (e) {
@@ -437,7 +392,6 @@
             }
             
             editor.value = originalContent;
-            updatePreview();
             checkForChanges();
             showStatus('Reset to original content', 'info');
         }
@@ -450,7 +404,6 @@
         resetBtn.addEventListener('click', resetToOriginal);
 
         editor.addEventListener('input', () => {
-            updatePreview();
             checkForChanges();
         });
 
