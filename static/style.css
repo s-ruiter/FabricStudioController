@@ -32,8 +32,8 @@ body {
     linear-gradient(135deg, transparent 20%, rgba(79,140,255,0.04) 40%, transparent 60%),
     linear-gradient(-135deg, transparent 20%, rgba(79,140,255,0.03) 40%, transparent 60%),
     var(--dark-bg);
-  background-size: cover, auto, auto, auto, auto, auto, auto;
-  background-position: center, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+  background-size: 100% auto, auto, auto, auto, auto, auto, auto;
+  background-position: center top, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
   color: var(--text-primary);
   margin: 0;
@@ -224,7 +224,7 @@ pre {
 
 .action-section {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -269,13 +269,14 @@ pre {
   background: var(--accent);
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 8px 14px;
   border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
   height: fit-content;
+  font-size: 0.9rem;
 }
 
 .action-button.primary:hover:not(:disabled) {
@@ -287,12 +288,13 @@ pre {
   background: var(--container-bg);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
-  padding: 10px 20px;
+  padding: 8px 14px;
   border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  font-size: 0.9rem;
 }
 
 .action-button.secondary:hover:not(:disabled) {

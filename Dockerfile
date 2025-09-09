@@ -29,17 +29,22 @@ COPY . .
 # Create startup script
 RUN echo '#!/bin/bash\n\
 echo "🔍 Checking gcloud authentication..."\n\
-if [ ! -f ~/.config/gcloud/application_default_credentials.json ]; then\n\
+if gcloud auth list --filter=status:ACTIVE --format="value(account)" | grep -q .; then\n\
+    echo "✅ gcloud authentication found"\n\
+    ACCOUNT=$(gcloud auth list --filter=status:ACTIVE --format="value(account)")\n\
+    PROJECT=$(gcloud config get-value project)\n\
+    echo "   Account: $ACCOUNT"\n\
+    echo "   Project: $PROJECT"\n\
+    echo "Starting FabricStudio Controller..."\n\
+    gunicorn -w 4 -b 0.0.0.0:8000 app:app\n\
+else\n\
     echo "❌ No gcloud authentication found"\n\
     echo "Please run: gcloud auth login"\n\
     echo "Then: gcloud config set project YOUR_PROJECT_ID"\n\
+    echo "Then run: python app.py"\n\
     echo ""\n\
     echo "Starting interactive shell..."\n\
     /bin/bash\n\
-else\n\
-    echo "✅ gcloud authentication found"\n\
-    echo "Starting FabricStudio Controller..."\n\
-    gunicorn -w 4 -b 0.0.0.0:8000 app:app\n\
 fi' > /app/start.sh
 
 RUN chmod +x /app/start.sh

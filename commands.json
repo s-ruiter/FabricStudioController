@@ -18,7 +18,8 @@
   },
   "Stop FAZ workshop POC": {
     "command": "runtime fabric uninstall",
-    "responses": {}
+    "responses": {},
+    "warning": true
   },
   "Shutdown Fabric Studio and VM": {
     "command": "system execute shutdown --no-interactive",
