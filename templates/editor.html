@@ -255,9 +255,9 @@
         </div>
 
         <div class="help-section">
-            <div class="help-title">💡 Editor Help</div>
+            <div class="help-title">💡 Commands Editor Help</div>
             <div class="help-content">
-                <p><strong>How to use:</strong></p>
+                <p><strong>How to use the editor:</strong></p>
                 <ul>
                     <li><strong>Load Current:</strong> Load the current commands.json file</li>
                     <li><strong>Save Changes:</strong> Save your changes (creates a backup automatically)</li>
@@ -274,11 +274,65 @@
                     <li>The editor provides syntax highlighting and error detection</li>
                 </ul>
                 
-                <p><strong>Configuration Section:</strong></p>
+                <hr style="margin: 20px 0; border: 1px solid var(--border-color);">
+                
+                <h3 style="color: var(--text-primary); margin-top: 0;">📋 Commands.json Structure</h3>
+                
+                <p><strong>Configuration Section (_config):</strong></p>
                 <ul>
-                    <li><code>_config.default_vm_filter</code>: Default VM filter text</li>
-                    <li><code>_config.default_vm_filter_placeholder</code>: Placeholder text for filter input</li>
+                    <li><code>default_vm_filter</code>: Default VM filter text used when no custom filter is entered</li>
+                    <li><code>default_vm_filter_placeholder</code>: Placeholder text shown in the VM filter input field</li>
                 </ul>
+                
+                <p><strong>Command Properties:</strong></p>
+                <ul>
+                    <li><code>command</code>: <strong>REQUIRED</strong> - The actual SSH command to execute on the remote VM</li>
+                    <li><code>responses</code>: <em>Optional</em> - Dictionary of response patterns for interactive commands (format: {"pattern": "response"})</li>
+                    <li><code>disconnect</code>: <em>Optional</em> - Set to true if the command will disconnect/reboot the VM (default: false)</li>
+                    <li><code>requires_extra_input</code>: <em>Optional</em> - Set to true if the command needs additional user input (default: false)</li>
+                    <li><code>prompt</code>: <em>Optional</em> - The prompt text to show when requires_extra_input is true</li>
+                    <li><code>warning</code>: <em>Optional</em> - Set to true if the command should show 'Are you sure?' confirmation (default: false)</li>
+                </ul>
+                
+                <p><strong>Usage Instructions:</strong></p>
+                <ul>
+                    <li><strong>Adding Commands:</strong> Add a new entry with a unique name as the key</li>
+                    <li><strong>Modifying Commands:</strong> Edit the properties in place</li>
+                    <li><strong>Restart Required:</strong> Restart the application after making changes to see them take effect</li>
+                    <li><strong>Config Changes:</strong> Changes to _config section take effect immediately without restart</li>
+                </ul>
+                
+                <p><strong>Example Commands:</strong></p>
+                
+                <p><strong>Simple Command:</strong></p>
+                <pre style="background: var(--input-bg); padding: 12px; border-radius: 6px; margin: 8px 0; overflow-x: auto;"><code>{
+  "System Status": {
+    "command": "system status",
+    "responses": {},
+    "disconnect": false
+  }
+}</code></pre>
+                
+                <p><strong>Interactive Command with User Input:</strong></p>
+                <pre style="background: var(--input-bg); padding: 12px; border-radius: 6px; margin: 8px 0; overflow-x: auto;"><code>{
+  "Change Password": {
+    "command": "execute password admin {extra_input}",
+    "requires_extra_input": true,
+    "prompt": "Enter new admin password:",
+    "responses": {"Password:": "{extra_input}"},
+    "disconnect": false
+  }
+}</code></pre>
+                
+                <p><strong>Dangerous Command with Confirmation:</strong></p>
+                <pre style="background: var(--input-bg); padding: 12px; border-radius: 6px; margin: 8px 0; overflow-x: auto;"><code>{
+  "Shutdown System": {
+    "command": "system execute shutdown --no-interactive",
+    "responses": {},
+    "warning": true,
+    "disconnect": true
+  }
+}</code></pre>
             </div>
         </div>
     </div>
