@@ -163,6 +163,51 @@ def index():
 def favicon():
     return send_from_directory(app.static_folder, 'favicon.ico')
 
+@app.route('/editor')
+def editor():
+    """JSON editor page for managing commands.json"""
+    return render_template('editor.html', commands=COMMAND_OPTIONS, config=CONFIG)
+
+@app.route('/api/commands', methods=['GET'])
+def get_commands():
+    """API endpoint to get current commands.json content"""
+    try:
+        with open('commands.json', 'r') as f:
+            content = f.read()
+        return jsonify({'success': True, 'content': content})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/commands', methods=['POST'])
+def save_commands():
+    """API endpoint to save commands.json content"""
+    try:
+        data = request.json
+        content = data.get('content', '')
+        
+        # Validate JSON before saving
+        try:
+            json.loads(content)
+        except json.JSONDecodeError as e:
+            return jsonify({'success': False, 'error': f'Invalid JSON: {str(e)}'}), 400
+        
+        # Backup current file
+        import shutil
+        shutil.copy('commands.json', 'commands.json.backup')
+        
+        # Save new content
+        with open('commands.json', 'w') as f:
+            f.write(content)
+        
+        # Reload commands and config
+        global COMMAND_OPTIONS, CONFIG
+        COMMAND_OPTIONS = load_commands()
+        CONFIG = get_config()
+        
+        return jsonify({'success': True, 'message': 'Commands saved successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 # --- GCloud CLI Check ---
 def check_gcloud_cli():
     """Check if gcloud CLI is installed and working."""

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commands Editor - FabricStudio Controller</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}?v=2" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2">
+    <style>
+        .editor-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: var(--elev-2);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .editor-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .nav-link {
+            padding: 8px 16px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        
+        .editor-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: var(--container-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--input-bg);
+            border-color: var(--accent);
+        }
+        
+        .btn-success {
+            background: var(--status-green);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #2bc484;
+        }
+        
+        .btn-danger {
+            background: var(--status-red);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .editor-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: calc(100vh - 200px);
+        }
+        
+        .editor-panel {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            padding: 12px 16px;
+            background: var(--elev-2);
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .editor-textarea {
+            flex: 1;
+            padding: 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            color: var(--text-primary);
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        
+        .editor-textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.2);
+        }
+        
+        .preview-panel {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .preview-content {
+            flex: 1;
+            padding: 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        
+        .status-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background: rgba(61, 220, 151, 0.15);
+            border: 1px solid var(--status-green);
+            color: #d7ffe8;
+        }
+        
+        .status-error {
+            background: rgba(255, 107, 107, 0.15);
+            border: 1px solid var(--status-red);
+            color: #ffd3d6;
+        }
+        
+        .status-info {
+            background: rgba(79, 140, 255, 0.15);
+            border: 1px solid var(--accent);
+            color: #e6f3ff;
+        }
+        
+        .help-section {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--elev-2);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        
+        .help-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        
+        .help-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .help-content code {
+            background: var(--input-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+        }
+        
+        @media (max-width: 1200px) {
+            .editor-wrapper {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .editor-textarea {
+                min-height: 400px;
+            }
+            
+            .preview-content {
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="editor-container">
+        <div class="editor-header">
+            <h1 class="editor-title">Commands Editor</h1>
+            <div class="nav-links">
+                <a href="/" class="nav-link">← Back to Main</a>
+            </div>
+        </div>
+
+        <div id="status-message" class="status-message" style="display: none;"></div>
+
+        <div class="editor-actions">
+            <button id="load-btn" class="btn btn-primary">
+                📁 Load Current
+            </button>
+            <button id="save-btn" class="btn btn-success" disabled>
+                💾 Save Changes
+            </button>
+            <button id="validate-btn" class="btn btn-secondary">
+                ✅ Validate JSON
+            </button>
+            <button id="format-btn" class="btn btn-secondary">
+                🎨 Format JSON
+            </button>
+            <button id="reset-btn" class="btn btn-danger">
+                🔄 Reset to Original
+            </button>
+        </div>
+
+        <div class="editor-wrapper">
+            <div class="editor-panel">
+                <div class="panel-header">JSON Editor</div>
+                <textarea id="json-editor" class="editor-textarea" placeholder="Loading commands.json..."></textarea>
+            </div>
+            
+            <div class="preview-panel">
+                <div class="panel-header">Preview</div>
+                <div id="preview-content" class="preview-content">Click "Load Current" to see the JSON content</div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <div class="help-title">💡 Editor Help</div>
+            <div class="help-content">
+                <p><strong>How to use:</strong></p>
+                <ul>
+                    <li><strong>Load Current:</strong> Load the current commands.json file</li>
+                    <li><strong>Save Changes:</strong> Save your changes (creates a backup automatically)</li>
+                    <li><strong>Validate JSON:</strong> Check if your JSON is valid before saving</li>
+                    <li><strong>Format JSON:</strong> Auto-format the JSON for better readability</li>
+                    <li><strong>Reset to Original:</strong> Discard changes and reload the original file</li>
+                </ul>
+                
+                <p><strong>Important Notes:</strong></p>
+                <ul>
+                    <li>Always validate JSON before saving to avoid breaking the application</li>
+                    <li>A backup is automatically created when you save changes</li>
+                    <li>Changes take effect immediately after saving</li>
+                    <li>Use the preview panel to see how your JSON will look</li>
+                </ul>
+                
+                <p><strong>Configuration Section:</strong></p>
+                <ul>
+                    <li><code>_config.default_vm_filter</code>: Default VM filter text</li>
+                    <li><code>_config.default_vm_filter_placeholder</code>: Placeholder text for filter input</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let originalContent = '';
+        let hasChanges = false;
+
+        const editor = document.getElementById('json-editor');
+        const preview = document.getElementById('preview-content');
+        const statusMessage = document.getElementById('status-message');
+        const loadBtn = document.getElementById('load-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const validateBtn = document.getElementById('validate-btn');
+        const formatBtn = document.getElementById('format-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        function showStatus(message, type = 'info') {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message status-${type}`;
+            statusMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        function updatePreview() {
+            try {
+                const content = editor.value;
+                const parsed = JSON.parse(content);
+                preview.textContent = JSON.stringify(parsed, null, 2);
+                preview.style.color = 'var(--text-primary)';
+            } catch (e) {
+                preview.textContent = `JSON Error: ${e.message}`;
+                preview.style.color = 'var(--status-red)';
+            }
+        }
+
+        function checkForChanges() {
+            hasChanges = editor.value !== originalContent;
+            saveBtn.disabled = !hasChanges;
+        }
+
+        async function loadCurrent() {
+            try {
+                loadBtn.disabled = true;
+                loadBtn.textContent = '⏳ Loading...';
+                
+                const response = await fetch('/api/commands');
+                const data = await response.json();
+                
+                if (data.success) {
+                    originalContent = data.content;
+                    editor.value = data.content;
+                    updatePreview();
+                    checkForChanges();
+                    showStatus('Commands loaded successfully', 'success');
+                } else {
+                    showStatus(`Error loading commands: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error loading commands: ${error.message}`, 'error');
+            } finally {
+                loadBtn.disabled = false;
+                loadBtn.textContent = '📁 Load Current';
+            }
+        }
+
+        async function saveChanges() {
+            try {
+                saveBtn.disabled = true;
+                saveBtn.textContent = '⏳ Saving...';
+                
+                const response = await fetch('/api/commands', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ content: editor.value })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    originalContent = editor.value;
+                    checkForChanges();
+                    showStatus('Commands saved successfully! Changes are now active.', 'success');
+                } else {
+                    showStatus(`Error saving commands: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error saving commands: ${error.message}`, 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = '💾 Save Changes';
+            }
+        }
+
+        function validateJSON() {
+            try {
+                JSON.parse(editor.value);
+                showStatus('✅ JSON is valid!', 'success');
+            } catch (e) {
+                showStatus(`❌ JSON Error: ${e.message}`, 'error');
+            }
+        }
+
+        function formatJSON() {
+            try {
+                const parsed = JSON.parse(editor.value);
+                const formatted = JSON.stringify(parsed, null, 2);
+                editor.value = formatted;
+                updatePreview();
+                checkForChanges();
+                showStatus('JSON formatted successfully', 'success');
+            } catch (e) {
+                showStatus(`Cannot format invalid JSON: ${e.message}`, 'error');
+            }
+        }
+
+        function resetToOriginal() {
+            if (hasChanges && !confirm('Are you sure you want to discard your changes?')) {
+                return;
+            }
+            
+            editor.value = originalContent;
+            updatePreview();
+            checkForChanges();
+            showStatus('Reset to original content', 'info');
+        }
+
+        // Event listeners
+        loadBtn.addEventListener('click', loadCurrent);
+        saveBtn.addEventListener('click', saveChanges);
+        validateBtn.addEventListener('click', validateJSON);
+        formatBtn.addEventListener('click', formatJSON);
+        resetBtn.addEventListener('click', resetToOriginal);
+
+        editor.addEventListener('input', () => {
+            updatePreview();
+            checkForChanges();
+        });
+
+        // Load content on page load
+        document.addEventListener('DOMContentLoaded', loadCurrent);
+    </script>
+</body>
+</html>
