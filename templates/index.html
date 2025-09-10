@@ -97,6 +97,7 @@
                             <button type="button" id="fetch-vms-btn" class="action-button primary">Fetch VM Status</button>
                             <button type="button" id="select-all-btn" class="action-button secondary" disabled>Select All VMs</button>
                             <button type="button" id="start-selected-btn" class="action-button secondary" disabled>Start Selected VMs</button>
+                            <button type="button" id="export-ips-btn" class="action-button secondary" disabled>📥 Export IPs to CSV</button>
                         </div>
                     </div>
                     <div id="vm-status-message"></div>
@@ -120,6 +121,7 @@
             const fetchVmsBtn = document.getElementById('fetch-vms-btn');
             const startSelectedBtn = document.getElementById('start-selected-btn');
             const selectAllBtn = document.getElementById('select-all-btn');
+            const exportIpsBtn = document.getElementById('export-ips-btn');
             const vmList = document.getElementById('vm-list');
             const hiddenIpInput = document.getElementById('ips');
             const ipDisplay = document.getElementById('selected-ips-display');
@@ -253,6 +255,9 @@
                     const allSelected = allCheckboxes.every(cb => cb.checked);
                     selectAllBtn.textContent = allSelected ? 'Deselect All VMs' : 'Select All VMs';
                 }
+                
+                // Update Export button state - only enable if there are selected VMs with IP addresses
+                exportIpsBtn.disabled = selectedIps.length === 0;
             }
 
             function toggleSelectAll() {
@@ -316,10 +321,42 @@
                     startSelectedBtn.disabled = false;
                 }
             }
+
+            function exportIpsToCsv() {
+                const selectedCheckboxes = Array.from(document.querySelectorAll('.vm-checkbox:checked'));
+                const selectedIps = selectedCheckboxes
+                    .filter(cb => cb.dataset.status === 'RUNNING' && cb.dataset.ip)
+                    .map(cb => cb.dataset.ip);
+
+                if (selectedIps.length === 0) return;
+
+                // Create CSV content with IP addresses, one per line
+                const csvContent = selectedIps.join('\n');
+                
+                // Create and trigger download
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `vm-ips-${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                // Show success message
+                vmStatusMessage.textContent = `Exported ${selectedIps.length} IP address(es) to CSV file`;
+                vmStatusMessage.className = 'status-message status-success';
+                setTimeout(() => {
+                    vmStatusMessage.textContent = '';
+                    vmStatusMessage.className = 'status-message';
+                }, 3000);
+            }
             
             fetchVmsBtn.addEventListener('click', fetchAndRenderVms);
             startSelectedBtn.addEventListener('click', startSelectedVms);
             selectAllBtn.addEventListener('click', toggleSelectAll);
+            exportIpsBtn.addEventListener('click', exportIpsToCsv);
             vmList.addEventListener('change', updateUiState);
             
             // Common filter button handlers
