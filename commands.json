@@ -21,7 +21,8 @@
     "command": "system execute upgrade --no-interactive",
     "responses": {},
     "disconnect": true,
-    "warning": true
+    "warning": true,
+    "disabled": true
   },
   "Change guest user password": {
     "command": "execute password guest {extra_input}",
@@ -32,8 +33,15 @@
   },
   "Shutdown FAD FortiPoC and VM": {
     "command": "execute shutdown",
-    "responses": {"Confirm shutdown" : "y\n"},
+    "responses": {
+      "Confirm shutdown": "y\n"
+    },
     "warning": true,
     "disconnect": true
+  },
+  "Test Disabled Command": {
+    "command": "echo 'This command is disabled'",
+    "responses": {},
+    "disabled": true
   }
 }

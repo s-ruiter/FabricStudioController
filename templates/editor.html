@@ -227,6 +227,7 @@
                     <li><code>requires_extra_input</code>: <em>Optional</em> - Set to true if the command needs additional user input (default: false)</li>
                     <li><code>prompt</code>: <em>Optional</em> - The prompt text to show when requires_extra_input is true</li>
                     <li><code>warning</code>: <em>Optional</em> - Set to true if the command should show 'Are you sure?' confirmation (default: false)</li>
+                    <li><code>disabled</code>: <em>Optional</em> - Set to true to hide the command from the dropdown menu (default: false)</li>
                 </ul>
                 
                 <p><strong>Usage Instructions:</strong></p>
@@ -266,6 +267,15 @@
     "responses": {},
     "warning": true,
     "disconnect": true
+  }
+}</code></pre>
+                
+                <p><strong>Disabled Command (Hidden from Dropdown):</strong></p>
+                <pre style="background: var(--input-bg); padding: 12px; border-radius: 6px; margin: 8px 0; overflow-x: auto;"><code>{
+  "Maintenance Mode": {
+    "command": "system maintenance enable",
+    "responses": {},
+    "disabled": true
   }
 }</code></pre>
             </div>

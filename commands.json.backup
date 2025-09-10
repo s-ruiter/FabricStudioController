@@ -31,9 +31,14 @@
     "disconnect": false
   },
   "Shutdown FAD FortiPoC and VM": {
-    "command": "system execute shutdown",
-    "responses": {"Confirm shutdown" : "y"},
+    "command": "execute shutdown",
+    "responses": {"Confirm shutdown" : "y\n"},
     "warning": true,
     "disconnect": true
+  },
+  "Test Disabled Command": {
+    "command": "echo 'This command is disabled'",
+    "responses": {},
+    "disabled": true
   }
 }
