@@ -82,8 +82,21 @@
                         <div class="filter-section">
                             <div class="filter-control">
                                 <label for="vm-filter">Filter VMs:</label>
-                                <input type="text" id="vm-filter" name="vm-filter" value="{{ config.default_vm_filter }}" placeholder="e.g., workshop, test, faz">
-                                <small class="filter-help">Enter text to search in VM names</small>
+                                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                    <select id="common-filter-1" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary); font-size: 0.9rem;">
+                                        <option value="">Select common filter...</option>
+                                        <option value="sru-fstudio-faz">sru-fstudio-faz</option>
+                                        <option value="sru-fpoc">sru-fpoc</option>
+                                    </select>
+                                    <select id="common-filter-2" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary); font-size: 0.9rem;">
+                                        <option value="">Or select another...</option>
+                                        <option value="sru-fstudio-faz">sru-fstudio-faz</option>
+                                        <option value="sru-fpoc">sru-fpoc</option>
+                                    </select>
+                                    <span style="color: var(--text-secondary); font-size: 0.9rem;">or</span>
+                                    <input type="text" id="vm-filter" name="vm-filter" value="{{ config.default_vm_filter }}" placeholder="e.g., workshop, test, faz" style="flex: 1; min-width: 200px;">
+                                </div>
+                                <small class="filter-help">Select a common filter or enter custom text to search in VM names</small>
                             </div>
                         </div>
                         <div class="action-section">
@@ -122,6 +135,8 @@
             const extraInputField = document.getElementById('extra-input');
             const extraInputLabel = document.getElementById('extra-input-label');
             const vmFilterInput = document.getElementById('vm-filter');
+            const commonFilter1 = document.getElementById('common-filter-1');
+            const commonFilter2 = document.getElementById('common-filter-2');
             
             let pollingInterval = null;
             let vmsToWatch = [];
@@ -312,6 +327,29 @@
             startSelectedBtn.addEventListener('click', startSelectedVms);
             selectAllBtn.addEventListener('click', toggleSelectAll);
             vmList.addEventListener('change', updateUiState);
+            
+            // Common filter select box handlers
+            commonFilter1.addEventListener('change', function() {
+                if (this.value) {
+                    vmFilterInput.value = this.value;
+                    commonFilter2.value = ''; // Clear the other select
+                }
+            });
+            
+            commonFilter2.addEventListener('change', function() {
+                if (this.value) {
+                    vmFilterInput.value = this.value;
+                    commonFilter1.value = ''; // Clear the other select
+                }
+            });
+            
+            // Clear select boxes when typing in text input
+            vmFilterInput.addEventListener('input', function() {
+                if (this.value) {
+                    commonFilter1.value = '';
+                    commonFilter2.value = '';
+                }
+            });
 
             function toggleExtraInput() {
                 const selectedOption = commandSelect.options[commandSelect.selectedIndex];
