@@ -286,7 +286,12 @@
                 const allCheckboxes = Array.from(document.querySelectorAll('.vm-checkbox'));
                 const startedVms = allCheckboxes.filter(cb => cb.dataset.status === 'RUNNING');
                 
-                // Always select only the started VMs (don't toggle, just select them)
+                // First deselect all VMs
+                allCheckboxes.forEach(cb => {
+                    cb.checked = false;
+                });
+                
+                // Then select only the started VMs
                 startedVms.forEach(cb => {
                     cb.checked = true;
                 });
