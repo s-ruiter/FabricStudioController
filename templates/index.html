@@ -280,7 +280,7 @@
                     vmStatusMessage.textContent = 'Unable to start VM. Check on Google Cloud console';
                     vmStatusMessage.className = 'status-message status-error';
                     startSelectedBtn.disabled = false;
-                }, 10000);
+                }, 20000);
 
                 try {
                     const response = await fetch('/start-vms', {
