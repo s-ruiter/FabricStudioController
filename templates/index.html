@@ -98,7 +98,8 @@
                         </div>
                         <div class="action-section">
                             <button type="button" id="fetch-vms-btn" class="action-button primary">Fetch VM Status</button>
-                            <button type="button" id="select-all-btn" class="action-button secondary" disabled>Select All VMs</button>
+                            <button type="button" id="select-all-btn" class="action-button secondary" disabled>Select All</button>
+                            <button type="button" id="select-started-btn" class="action-button secondary" disabled>Select Started</button>
                             <button type="button" id="start-selected-btn" class="action-button secondary" disabled>Start Selected VMs</button>
                         </div>
                     </div>
@@ -123,6 +124,7 @@
             const fetchVmsBtn = document.getElementById('fetch-vms-btn');
             const startSelectedBtn = document.getElementById('start-selected-btn');
             const selectAllBtn = document.getElementById('select-all-btn');
+            const selectStartedBtn = document.getElementById('select-started-btn');
             const exportIpsBtn = document.getElementById('export-ips-btn');
             const vmList = document.getElementById('vm-list');
             const hiddenIpInput = document.getElementById('ips');
@@ -255,8 +257,12 @@
                 selectAllBtn.disabled = allCheckboxes.length === 0;
                 if (allCheckboxes.length > 0) {
                     const allSelected = allCheckboxes.every(cb => cb.checked);
-                    selectAllBtn.textContent = allSelected ? 'Deselect All VMs' : 'Select All VMs';
+                    selectAllBtn.textContent = allSelected ? 'Deselect All' : 'Select All';
                 }
+                
+                // Update Select Started button state
+                const startedVms = allCheckboxes.filter(cb => cb.dataset.status === 'RUNNING');
+                selectStartedBtn.disabled = startedVms.length === 0;
                 
                 // Update Export button state - only enable if there are selected VMs with IP addresses
                 exportIpsBtn.disabled = selectedIps.length === 0;
@@ -268,6 +274,21 @@
                 
                 allCheckboxes.forEach(cb => {
                     cb.checked = !allSelected;
+                });
+                
+                updateUiState();
+            }
+
+            function selectStartedVms() {
+                const allCheckboxes = Array.from(document.querySelectorAll('.vm-checkbox'));
+                const startedVms = allCheckboxes.filter(cb => cb.dataset.status === 'RUNNING');
+                
+                // Check if all started VMs are already selected
+                const allStartedSelected = startedVms.every(cb => cb.checked);
+                
+                // Toggle selection for started VMs only
+                startedVms.forEach(cb => {
+                    cb.checked = !allStartedSelected;
                 });
                 
                 updateUiState();
@@ -358,6 +379,7 @@
             fetchVmsBtn.addEventListener('click', fetchAndRenderVms);
             startSelectedBtn.addEventListener('click', startSelectedVms);
             selectAllBtn.addEventListener('click', toggleSelectAll);
+            selectStartedBtn.addEventListener('click', selectStartedVms);
             exportIpsBtn.addEventListener('click', exportIpsToCsv);
             vmList.addEventListener('change', updateUiState);
             
