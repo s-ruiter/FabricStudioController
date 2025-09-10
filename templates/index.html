@@ -210,7 +210,7 @@
                             clearTimeout(startTimeout);
                             startTimeout = null;
                         }
-                        vmStatusMessage.textContent = 'All selected VMs are running and have an IP address.';
+                        vmStatusMessage.textContent = 'All selected VMs are running and have an IP address. Please wait for the VM to become ready.';
                         vmStatusMessage.className = 'status-message status-success';
                     } else if (!pollingInterval) {
                          vmStatusMessage.textContent = '';
@@ -274,7 +274,7 @@
                 if (vmsToStart.length === 0) return;
 
                 startSelectedBtn.disabled = true;
-                vmStatusMessage.textContent = 'Please wait for the VM to become ready';
+                vmStatusMessage.textContent = `Start command for ${vmsToStart.length} VM(s) sent. Refreshing status...`;
                 vmStatusMessage.className = 'status-message';
                 
                 vmsToWatch = vmsToStart.map(vm => vm.name);
