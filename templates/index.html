@@ -77,7 +77,10 @@
 
             <section class="right-col">
                 <div class="vm-manager">
-                    <h2>VM Management</h2>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                        <h2 style="margin: 0;">VM Management</h2>
+                        <button type="button" id="export-ips-btn" class="action-button secondary" disabled>📥 Export IPs to CSV</button>
+                    </div>
                     <div class="vm-controls">
                         <div class="filter-section">
                             <div class="filter-control">
@@ -97,7 +100,6 @@
                             <button type="button" id="fetch-vms-btn" class="action-button primary">Fetch VM Status</button>
                             <button type="button" id="select-all-btn" class="action-button secondary" disabled>Select All VMs</button>
                             <button type="button" id="start-selected-btn" class="action-button secondary" disabled>Start Selected VMs</button>
-                            <button type="button" id="export-ips-btn" class="action-button secondary" disabled>📥 Export IPs to CSV</button>
                         </div>
                     </div>
                     <div id="vm-status-message"></div>
