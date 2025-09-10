@@ -351,6 +351,18 @@ pre {
 
 #selected-ips-display { background-color: var(--input-bg); border: 1px solid var(--border-color); padding: 10px; border-radius: 10px; color: var(--text-secondary); min-height: 1.2em; }
 
+/* GitHub link styling in footer */
+footer a {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+footer a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
 /* Stack columns on tablets/phones */
 @media (max-width: 900px) {
   .grid-2col { grid-template-columns: 1fr; }
