@@ -125,6 +125,7 @@
             
             let pollingInterval = null;
             let vmsToWatch = [];
+            let startTimeout = null;
 
             // --- Main function to fetch and render the VM list ---
             async function fetchAndRenderVms() {
@@ -195,6 +196,11 @@
                         clearInterval(pollingInterval);
                         pollingInterval = null;
                         vmsToWatch = [];
+                        // Clear timeout when VMs successfully start
+                        if (startTimeout) {
+                            clearTimeout(startTimeout);
+                            startTimeout = null;
+                        }
                         vmStatusMessage.textContent = 'All selected VMs are running and have an IP address.';
                         vmStatusMessage.className = 'status-message status-success';
                     } else if (!pollingInterval) {
@@ -208,6 +214,11 @@
                     vmStatusMessage.className = 'status-message status-error';
                     clearInterval(pollingInterval);
                     pollingInterval = null;
+                    // Clear timeout on error
+                    if (startTimeout) {
+                        clearTimeout(startTimeout);
+                        startTimeout = null;
+                    }
                 } finally {
                     fetchVmsBtn.disabled = false;
                 }
@@ -259,6 +270,18 @@
                 
                 vmsToWatch = vmsToStart.map(vm => vm.name);
 
+                // Set up 10-second timeout
+                startTimeout = setTimeout(() => {
+                    if (pollingInterval) {
+                        clearInterval(pollingInterval);
+                        pollingInterval = null;
+                    }
+                    vmsToWatch = [];
+                    vmStatusMessage.textContent = 'Unable to start VM. Check on Google Cloud console';
+                    vmStatusMessage.className = 'status-message status-error';
+                    startSelectedBtn.disabled = false;
+                }, 10000);
+
                 try {
                     const response = await fetch('/start-vms', {
                         method: 'POST',
@@ -273,9 +296,15 @@
                          pollingInterval = setInterval(fetchAndRenderVms, 5000);
                     }
                 } catch (error) {
+                    // Clear timeout on error
+                    if (startTimeout) {
+                        clearTimeout(startTimeout);
+                        startTimeout = null;
+                    }
                     vmStatusMessage.textContent = `Error starting VMs: ${error.message}`;
                     vmStatusMessage.className = 'status-message status-error';
                     vmsToWatch = [];
+                    startSelectedBtn.disabled = false;
                 }
             }
             
@@ -332,9 +361,6 @@
         </div>
         <div style="margin-bottom: 4px;">
             Developed by <strong>Sander Ruiter</strong>
-        </div>
-        <div>
-            <a href="mailto:sruiter@fortinet.com" style="color: var(--accent); text-decoration: none;">sruiter@fortinet.com</a>
         </div>
     </footer>
 </body>
