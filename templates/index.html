@@ -274,7 +274,7 @@
                 if (vmsToStart.length === 0) return;
 
                 startSelectedBtn.disabled = true;
-                vmStatusMessage.textContent = `Start command for ${vmsToStart.length} VM(s) sent. Refreshing status...`;
+                vmStatusMessage.textContent = 'Please wait for the VM to become ready';
                 vmStatusMessage.className = 'status-message';
                 
                 vmsToWatch = vmsToStart.map(vm => vm.name);
