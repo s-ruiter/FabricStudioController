@@ -1,7 +1,4 @@
 {
-  "_config": {
-    "default_vm_filter": "sru-fstudio-faz"
-  },
   "Start FAZ workshop POC": {
     "command": "runtime fabric install --power-on-vms FAZ-Workshop2025",
     "responses": {},

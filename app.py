@@ -33,9 +33,7 @@ COMMAND_OPTIONS = load_commands()
 # Extract configuration from commands file
 def get_config():
     """Extract configuration from commands.json file."""
-    config = {
-        'default_vm_filter': 'sru-fstudio-faz'
-    }
+    config = {}
     
     if '_config' in COMMAND_OPTIONS:
         config.update(COMMAND_OPTIONS['_config'])
@@ -57,8 +55,8 @@ def reload_application_state():
 def get_gcp_vms():
     """Fetch a detailed list of VMs including name, zone, status and IP."""
     try:
-        # Get filter from query parameter, default to configured filter
-        default_filter = f"name~^{CONFIG['default_vm_filter']}"
+        # Get filter from query parameter, default to hardcoded "sru" filter
+        default_filter = "name~sru"
         filter_value = request.args.get('filter', default_filter)
         
         gcloud_command = [
@@ -157,13 +155,13 @@ def index():
             extra_input = request.form.get('extra_input')
             if not extra_input:
                 output = "Error: This command requires additional input."
-                return render_template('index.html', output=output, commands=COMMAND_OPTIONS, gcloud_status=gcloud_status, config=CONFIG)
+                return render_template('index.html', output=output, commands=COMMAND_OPTIONS, gcloud_status=gcloud_status)
             final_command = command_template.format(extra_input=extra_input)
         if not all([hosts, username, password, command_template]):
             output = "Error: Please fill in all fields."
         else:
             output = execute_remote_command(hosts, username, password, final_command)
-    return render_template('index.html', output=output, commands=COMMAND_OPTIONS, gcloud_status=gcloud_status, config=CONFIG)
+    return render_template('index.html', output=output, commands=COMMAND_OPTIONS, gcloud_status=gcloud_status)
 
 @app.route('/favicon.ico')
 def favicon():
@@ -172,7 +170,7 @@ def favicon():
 @app.route('/editor')
 def editor():
     """JSON editor page for managing commands.json"""
-    return render_template('editor.html', commands=COMMAND_OPTIONS, config=CONFIG)
+    return render_template('editor.html', commands=COMMAND_OPTIONS)
 
 @app.route('/api/commands', methods=['GET'])
 def get_commands():
