@@ -33,7 +33,9 @@ COMMAND_OPTIONS = load_commands()
 # Extract configuration from commands file
 def get_config():
     """Extract configuration from commands.json file."""
-    config = {}
+    config = {
+        'default_vm_filter': 'sru-fstudio-faz'
+    }
     
     if '_config' in COMMAND_OPTIONS:
         config.update(COMMAND_OPTIONS['_config'])
@@ -55,9 +57,20 @@ def reload_application_state():
 def get_gcp_vms():
     """Fetch a detailed list of VMs including name, zone, status and IP."""
     try:
-        # Get filter from query parameter, default to hardcoded "sru" filter
-        default_filter = "name~sru"
+        # Get filter from query parameter, default to configured filter
+        default_filter = f"name~^{CONFIG['default_vm_filter']}"
         filter_value = request.args.get('filter', default_filter)
+        
+        # Ensure filter always contains "sru" - if user provides custom filter, combine with sru
+        if filter_value != default_filter and 'sru' not in filter_value.lower():
+            # If custom filter doesn't contain sru, combine it with sru filter
+            if filter_value.startswith('name~'):
+                # Extract the pattern after name~
+                pattern = filter_value[5:]
+                filter_value = f"name~sru AND name~{pattern}"
+            else:
+                # Simple text search, combine with sru
+                filter_value = f"name~sru AND name~{filter_value}"
         
         gcloud_command = [
             'gcloud', 'compute', 'instances', 'list',
@@ -155,13 +168,13 @@ def index():
             extra_input = request.form.get('extra_input')
             if not extra_input:
                 output = "Error: This command requires additional input."
-                return render_template('index.html', output=output, commands=COMMAND_OPTIONS, gcloud_status=gcloud_status)
+                return render_template('index.html', output=output, commands=COMMAND_OPTIONS, gcloud_status=gcloud_status, config=CONFIG)
             final_command = command_template.format(extra_input=extra_input)
         if not all([hosts, username, password, command_template]):
             output = "Error: Please fill in all fields."
         else:
             output = execute_remote_command(hosts, username, password, final_command)
-    return render_template('index.html', output=output, commands=COMMAND_OPTIONS, gcloud_status=gcloud_status)
+    return render_template('index.html', output=output, commands=COMMAND_OPTIONS, gcloud_status=gcloud_status, config=CONFIG)
 
 @app.route('/favicon.ico')
 def favicon():
@@ -170,7 +183,7 @@ def favicon():
 @app.route('/editor')
 def editor():
     """JSON editor page for managing commands.json"""
-    return render_template('editor.html', commands=COMMAND_OPTIONS)
+    return render_template('editor.html', commands=COMMAND_OPTIONS, config=CONFIG)
 
 @app.route('/api/commands', methods=['GET'])
 def get_commands():
