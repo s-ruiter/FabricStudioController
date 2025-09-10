@@ -363,6 +363,27 @@ footer a:hover {
   text-decoration: underline;
 }
 
+/* Filter button styling */
+.filter-button {
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.filter-button:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3);
+}
+
 /* Stack columns on tablets/phones */
 @media (max-width: 900px) {
   .grid-2col { grid-template-columns: 1fr; }

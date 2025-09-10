@@ -83,16 +83,10 @@
                             <div class="filter-control">
                                 <label for="vm-filter">Filter VMs:</label>
                                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                                    <select id="common-filter-1" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary); font-size: 0.9rem;">
-                                        <option value="">Select common filter...</option>
-                                        <option value="sru-fstudio-faz">sru-fstudio-faz</option>
-                                        <option value="sru-fpoc">sru-fpoc</option>
-                                    </select>
-                                    <select id="common-filter-2" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary); font-size: 0.9rem;">
-                                        <option value="">Or select another...</option>
-                                        <option value="sru-fstudio-faz">sru-fstudio-faz</option>
-                                        <option value="sru-fpoc">sru-fpoc</option>
-                                    </select>
+                                    <div style="display: flex; gap: 8px; align-items: center;">
+                                        <div id="common-filter-1" class="filter-button" data-filter="sru-fstudio-faz" style="padding: 8px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary); font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; user-select: none;">sru-fstudio-faz</div>
+                                        <div id="common-filter-2" class="filter-button" data-filter="sru-fpoc" style="padding: 8px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary); font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; user-select: none;">sru-fpoc</div>
+                                    </div>
                                     <span style="color: var(--text-secondary); font-size: 0.9rem;">or</span>
                                     <input type="text" id="vm-filter" name="vm-filter" value="{{ config.default_vm_filter }}" placeholder="e.g., workshop, test, faz" style="flex: 1; min-width: 200px;">
                                 </div>
@@ -328,27 +322,31 @@
             selectAllBtn.addEventListener('click', toggleSelectAll);
             vmList.addEventListener('change', updateUiState);
             
-            // Common filter select box handlers
-            commonFilter1.addEventListener('change', function() {
-                if (this.value) {
-                    vmFilterInput.value = this.value;
-                    commonFilter2.value = ''; // Clear the other select
-                }
+            // Common filter button handlers
+            commonFilter1.addEventListener('click', function() {
+                vmFilterInput.value = this.getAttribute('data-filter');
+                // Add visual feedback
+                this.style.background = 'var(--accent)';
+                this.style.color = 'white';
+                commonFilter2.style.background = 'var(--input-bg)';
+                commonFilter2.style.color = 'var(--text-primary)';
             });
             
-            commonFilter2.addEventListener('change', function() {
-                if (this.value) {
-                    vmFilterInput.value = this.value;
-                    commonFilter1.value = ''; // Clear the other select
-                }
+            commonFilter2.addEventListener('click', function() {
+                vmFilterInput.value = this.getAttribute('data-filter');
+                // Add visual feedback
+                this.style.background = 'var(--accent)';
+                this.style.color = 'white';
+                commonFilter1.style.background = 'var(--input-bg)';
+                commonFilter1.style.color = 'var(--text-primary)';
             });
             
-            // Clear select boxes when typing in text input
+            // Reset button styles when typing in text input
             vmFilterInput.addEventListener('input', function() {
-                if (this.value) {
-                    commonFilter1.value = '';
-                    commonFilter2.value = '';
-                }
+                commonFilter1.style.background = 'var(--input-bg)';
+                commonFilter1.style.color = 'var(--text-primary)';
+                commonFilter2.style.background = 'var(--input-bg)';
+                commonFilter2.style.color = 'var(--text-primary)';
             });
 
             function toggleExtraInput() {
