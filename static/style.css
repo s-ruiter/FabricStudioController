@@ -344,19 +344,6 @@ pre {
   transform: translateY(-1px);
 }
 
-/* Selected IPs display hyperlink styling */
-#selected-ips-display a {
-  color: var(--accent);
-  text-decoration: none;
-  transition: all 0.2s ease;
-  border-bottom: 1px solid transparent;
-}
-
-#selected-ips-display a:hover {
-  color: var(--accent-hover);
-  text-decoration: underline;
-  border-bottom-color: var(--accent-hover);
-}
 
 .status-message { margin-top: 10px; padding: 10px; border-radius: 10px; }
 .status-error { color: #ffd3d6; background-color: rgba(255, 107, 107, 0.15); border: 1px solid var(--status-red); }

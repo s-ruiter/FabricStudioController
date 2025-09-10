@@ -222,12 +222,7 @@
                     .map(cb => cb.dataset.ip);
                 
                 hiddenIpInput.value = selectedIps.join('\n');
-                if (selectedIps.length > 0) {
-                    const ipLinks = selectedIps.map(ip => `<a href="https://${ip}" target="_blank" rel="noopener noreferrer" style="color: var(--accent); text-decoration: none;">${ip}</a>`).join(', ');
-                    ipDisplay.innerHTML = ipLinks;
-                } else {
-                    ipDisplay.textContent = 'Select active VMs...';
-                }
+                ipDisplay.textContent = selectedIps.length > 0 ? selectedIps.join(', ') : 'Select active VMs...';
 
                 const selectedTerminated = selectedCheckboxes.filter(cb => cb.dataset.status === 'TERMINATED');
                 startSelectedBtn.disabled = selectedTerminated.length === 0;
@@ -331,7 +326,7 @@
     <!-- Footer with version and contact info -->
     <footer style="margin-top: 40px; padding: 20px 0; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
         <div style="margin-bottom: 8px;">
-            <strong>FabricStudio Controller</strong> v1.1
+            <strong>FabricStudio Controller</strong> v1.2
         </div>
         <div style="margin-bottom: 4px;">
             Developed by <strong>Sander Ruiter</strong>
