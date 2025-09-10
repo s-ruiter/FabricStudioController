@@ -210,7 +210,7 @@
                             clearTimeout(startTimeout);
                             startTimeout = null;
                         }
-                        vmStatusMessage.textContent = 'All selected VMs are running and have an IP address. Please wait for the VM to become ready.';
+                        vmStatusMessage.textContent = 'All selected VMs are running and have an IP address. Please wait for the VM to become ready before sending commands.';
                         vmStatusMessage.className = 'status-message status-success';
                     } else if (!pollingInterval) {
                          vmStatusMessage.textContent = '';
@@ -393,7 +393,7 @@
         <div style="margin-bottom: 8px;">
             <a href="https://github.com/s-ruiter/FabricStudioController" target="_blank" rel="noopener noreferrer" style="color: var(--text-primary); text-decoration: none;">
                 <strong>FabricStudio Controller</strong>
-            </a> v1.2
+            </a> v1.3
         </div>
         <div style="margin-bottom: 4px;">
             Developed by <strong>Sander Ruiter</strong>
