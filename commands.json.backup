@@ -1,10 +1,39 @@
 {
   "_config": {
-    "default_vm_filter": "test-filter"
+    "default_vm_filter": "sru-fstudio-faz"
   },
-  "Test Command": {
-    "command": "echo test",
+  "Start FAZ workshop POC": {
+    "command": "runtime fabric install --power-on-vms FAZ-Workshop2025",
     "responses": {},
     "disconnect": false
+  },
+  "Stop FAZ workshop POC": {
+    "command": "runtime fabric uninstall",
+    "responses": {},
+    "warning": true
+  },
+  "Shutdown Fabric Studio and VM": {
+    "command": "system execute shutdown --no-interactive",
+    "responses": {},
+    "warning": true
+  },
+  "Fabric Studio Upgrade": {
+    "command": "system execute upgrade --no-interactive",
+    "responses": {},
+    "disconnect": true,
+    "warning": true
+  },
+  "Change guest user password": {
+    "command": "execute password guest {extra_input}",
+    "requires_extra_input": true,
+    "prompt": "New password for guest user:",
+    "responses": {},
+    "disconnect": false
+  },
+  "Shutdown FAD FortiPoC and VM": {
+    "command": "system execute shutdown",
+    "responses": {"Confirm shutdown" : "y"},
+    "warning": true,
+    "disconnect": true
   }
 }

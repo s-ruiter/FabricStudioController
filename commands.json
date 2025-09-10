@@ -29,5 +29,11 @@
     "prompt": "New password for guest user:",
     "responses": {},
     "disconnect": false
+  },
+  "Shutdown FAD FortiPoC and VM": {
+    "command": "execute shutdown",
+    "responses": {"Confirm shutdown" : "y\n"},
+    "warning": true,
+    "disconnect": true
   }
 }
