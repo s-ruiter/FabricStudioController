@@ -1,0 +1,10 @@
+{
+  "_config": {
+    "default_vm_filter": "test-filter"
+  },
+  "Test Command": {
+    "command": "echo test",
+    "responses": {},
+    "disconnect": false
+  }
+}

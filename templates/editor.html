@@ -333,7 +333,8 @@
                 if (data.success) {
                     originalContent = editor.value;
                     checkForChanges();
-                    showStatus('Commands saved successfully! Changes are now active.', 'success');
+                    const reloadedCount = data.reloaded_commands || 'unknown';
+                    showStatus(`Commands saved successfully! ${reloadedCount} commands loaded and changes are now active.`, 'success');
                 } else {
                     showStatus(`Error saving commands: ${data.error}`, 'error');
                 }

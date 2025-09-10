@@ -44,6 +44,13 @@ def get_config():
 
 CONFIG = get_config()
 
+def reload_application_state():
+    """Reload commands and configuration from files."""
+    global COMMAND_OPTIONS, CONFIG
+    COMMAND_OPTIONS = load_commands()
+    CONFIG = get_config()
+    print(f"🔄 Application state reloaded: {len(COMMAND_OPTIONS)} commands, config: {CONFIG}")
+
 # --- API Endpoints for Google Cloud ---
 
 @app.route('/get-vms')
@@ -198,14 +205,26 @@ def save_commands():
         with open('commands.json', 'w') as f:
             f.write(content)
         
-        # Reload commands and config
-        global COMMAND_OPTIONS, CONFIG
-        COMMAND_OPTIONS = load_commands()
-        CONFIG = get_config()
+        # Reload application state
+        reload_application_state()
         
-        return jsonify({'success': True, 'message': 'Commands saved successfully'})
+        return jsonify({
+            'success': True, 
+            'message': 'Commands saved successfully',
+            'reloaded_commands': len(COMMAND_OPTIONS),
+            'current_config': CONFIG
+        })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/status')
+def get_status():
+    """API endpoint to check current application state."""
+    return jsonify({
+        'commands_count': len(COMMAND_OPTIONS),
+        'config': CONFIG,
+        'available_commands': [name for name, info in COMMAND_OPTIONS.items() if not name.startswith('_') and isinstance(info, dict)]
+    })
 
 # --- GCloud CLI Check ---
 def check_gcloud_cli():
