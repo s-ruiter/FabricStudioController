@@ -97,7 +97,7 @@
                             </div>
                         </div>
                         <div class="action-section">
-                            <button type="button" id="fetch-vms-btn" class="action-button primary">Fetch VM Status</button>
+                            <button type="button" id="fetch-vms-btn" class="action-button primary">Fetch Status</button>
                             <button type="button" id="select-all-btn" class="action-button secondary" disabled>Select All</button>
                             <button type="button" id="select-started-btn" class="action-button secondary" disabled>Select Started</button>
                             <button type="button" id="start-selected-btn" class="action-button secondary" disabled>Start Selected VMs</button>
@@ -251,7 +251,10 @@
                 ipDisplay.textContent = selectedIps.length > 0 ? selectedIps.join(', ') : 'Select active VMs...';
 
                 const selectedTerminated = selectedCheckboxes.filter(cb => cb.dataset.status === 'TERMINATED');
-                startSelectedBtn.disabled = selectedTerminated.length === 0;
+                const selectedRunning = selectedCheckboxes.filter(cb => cb.dataset.status === 'RUNNING');
+                
+                // Only enable Start button if there are selected TERMINATED VMs and NO selected RUNNING VMs
+                startSelectedBtn.disabled = selectedTerminated.length === 0 || selectedRunning.length > 0;
                 
                 // Update Select All button state
                 selectAllBtn.disabled = allCheckboxes.length === 0;
