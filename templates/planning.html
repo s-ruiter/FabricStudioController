@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VM Planning - FabricStudio Controller</title>
+    <title>Workshop Schedule - FabricStudio Controller</title>
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}?v=2" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2">
     <style>
@@ -15,8 +15,7 @@
         
         .planning-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: space-between; align-items: center;
             margin-bottom: 30px;
             padding: 20px;
             background: var(--elev-2);
@@ -84,7 +83,6 @@
         }
         
         .form-group input,
-        .form-group textarea,
         .form-group select {
             width: 100%;
             padding: 12px;
@@ -97,16 +95,10 @@
         }
         
         .form-group input:focus,
-        .form-group textarea:focus,
         .form-group select:focus {
             outline: none;
             border-color: var(--accent);
             box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.2);
-        }
-        
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
         }
         
         .save-btn {
@@ -183,6 +175,12 @@
             transform: translateY(-1px);
         }
         
+        .entry-workshop {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
         .entry-comment {
             color: var(--text-secondary);
             line-height: 1.5;
@@ -226,7 +224,7 @@
 <body>
     <div class="planning-container">
         <div class="planning-header">
-            <h1 class="planning-title">📅 VM Planning</h1>
+            <h1 class="planning-title">📅 Workshop Schedule</h1>
             <div class="nav-links">
                 <a href="/" class="nav-link">← Back to Main</a>
                 <a href="/editor" class="nav-link">⚙️ Edit Commands</a>
@@ -253,7 +251,7 @@
                     </div>
                     <div class="form-group">
                         <label for="planning-comment">Comment:</label>
-                        <textarea id="planning-comment" name="comment" placeholder="Describe what the VMs will be used for, who will be using them, etc." required></textarea>
+                        <input type="text" id="planning-comment" name="comment" placeholder="Describe what the VMs will be used for, who will be using them, etc." required>
                     </div>
                     <button type="submit" class="save-btn" id="save-btn">💾 Save Entry</button>
                 </form>
@@ -262,7 +260,7 @@
             <div class="entries-section">
                 <h2 class="section-title">Scheduled Entries</h2>
                 <div id="entries-list">
-                    <div class="no-entries">No entries yet. Add your first planning entry!</div>
+                    <div class="no-entries">No entries yet. Add your first workshop entry!</div>
                 </div>
             </div>
         </div>
@@ -295,7 +293,7 @@
             const entriesList = document.getElementById('entries-list');
             
             if (entries.length === 0) {
-                entriesList.innerHTML = '<div class="no-entries">No entries yet. Add your first planning entry!</div>';
+                entriesList.innerHTML = '<div class="no-entries">No entries yet. Add your first workshop entry!</div>';
                 return;
             }
 
@@ -308,9 +306,7 @@
                         <span class="entry-date">${formatDate(entry.date)}</span>
                         <button class="delete-btn" onclick="deleteEntry(${index})">🗑️ Delete</button>
                     </div>
-                    <div style="margin-bottom: 8px;">
-                        <strong style="color: var(--accent);">${entry.workshopType || 'Unknown Workshop'}</strong>
-                    </div>
+                    <div class="entry-workshop">${entry.workshopType || 'Unknown Workshop'}</div>
                     <p class="entry-comment">${entry.comment}</p>
                 </div>
             `).join('');
@@ -365,10 +361,10 @@
                 return;
             }
             
-            // Check if entry already exists for this date
-            const existingEntry = entries.find(entry => entry.date === date);
+            // Check if entry already exists for this date and workshop type
+            const existingEntry = entries.find(entry => entry.date === date && entry.workshopType === workshopType);
             if (existingEntry) {
-                showStatus(`This date is already used for "${existingEntry.workshopType}". Please choose a different date.`, 'error');
+                showStatus(`This date already has a "${workshopType}" entry. Please choose a different date or workshop type.`, 'error');
                 return;
             }
             
