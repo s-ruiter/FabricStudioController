@@ -84,7 +84,8 @@
         }
         
         .form-group input,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             width: 100%;
             padding: 12px;
             border: 1px solid var(--border-color);
@@ -96,7 +97,8 @@
         }
         
         .form-group input:focus,
-        .form-group textarea:focus {
+        .form-group textarea:focus,
+        .form-group select:focus {
             outline: none;
             border-color: var(--accent);
             box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.2);
@@ -242,6 +244,14 @@
                         <input type="date" id="planning-date" name="date" required>
                     </div>
                     <div class="form-group">
+                        <label for="workshop-type">Workshop Type:</label>
+                        <select id="workshop-type" name="workshop_type" required>
+                            <option value="">Select workshop type...</option>
+                            <option value="FAZ Workshop">FAZ Workshop</option>
+                            <option value="FAD/FWB Workshop">FAD/FWB Workshop</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="planning-comment">Comment:</label>
                         <textarea id="planning-comment" name="comment" placeholder="Describe what the VMs will be used for, who will be using them, etc." required></textarea>
                     </div>
@@ -298,6 +308,9 @@
                         <span class="entry-date">${formatDate(entry.date)}</span>
                         <button class="delete-btn" onclick="deleteEntry(${index})">🗑️ Delete</button>
                     </div>
+                    <div style="margin-bottom: 8px;">
+                        <strong style="color: var(--accent);">${entry.workshopType || 'Unknown Workshop'}</strong>
+                    </div>
                     <p class="entry-comment">${entry.comment}</p>
                 </div>
             `).join('');
@@ -324,10 +337,11 @@
             renderEntries();
         }
 
-        function addEntry(date, comment) {
+        function addEntry(date, workshopType, comment) {
             const newEntry = {
                 id: Date.now(),
                 date: date,
+                workshopType: workshopType,
                 comment: comment,
                 created: new Date().toISOString()
             };
@@ -343,9 +357,10 @@
             e.preventDefault();
             
             const date = document.getElementById('planning-date').value;
+            const workshopType = document.getElementById('workshop-type').value;
             const comment = document.getElementById('planning-comment').value.trim();
             
-            if (!date || !comment) {
+            if (!date || !workshopType || !comment) {
                 showStatus('Please fill in all fields', 'error');
                 return;
             }
@@ -353,19 +368,16 @@
             // Check if entry already exists for this date
             const existingEntry = entries.find(entry => entry.date === date);
             if (existingEntry) {
-                if (confirm('An entry already exists for this date. Do you want to replace it?')) {
-                    existingEntry.comment = comment;
-                    saveEntries();
-                    renderEntries();
-                    showStatus('Entry updated successfully!', 'success');
-                }
+                showStatus(`This date is already used for "${existingEntry.workshopType}". Please choose a different date.`, 'error');
                 return;
             }
             
-            addEntry(date, comment);
+            addEntry(date, workshopType, comment);
             
             // Clear form
             document.getElementById('planning-form').reset();
+            // Set today's date as default
+            document.getElementById('planning-date').valueAsDate = new Date();
         });
 
         // Set today's date as default
