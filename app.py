@@ -190,6 +190,42 @@ def planning():
     """VM planning page for scheduling VM usage"""
     return render_template('planning.html')
 
+@app.route('/api/workshops', methods=['GET'])
+def get_workshops():
+    """API endpoint to get current workshop schedule"""
+    try:
+        with open('workshop_schedule.json', 'r') as f:
+            content = f.read()
+        return jsonify({'success': True, 'content': content})
+    except FileNotFoundError:
+        return jsonify({'success': True, 'content': '[]'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/workshops', methods=['POST'])
+def save_workshops():
+    """API endpoint to save workshop schedule"""
+    try:
+        data = request.json
+        content = data.get('content', '')
+        
+        # Validate JSON before saving
+        try:
+            json.loads(content)
+        except json.JSONDecodeError as e:
+            return jsonify({'success': False, 'error': f'Invalid JSON: {str(e)}'}), 400
+        
+        # Save new content
+        with open('workshop_schedule.json', 'w') as f:
+            f.write(content)
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Workshop schedule saved successfully'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/commands', methods=['GET'])
 def get_commands():
     """API endpoint to get current commands.json content"""

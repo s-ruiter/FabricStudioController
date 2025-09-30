@@ -447,15 +447,18 @@
             // VM list will be loaded when user clicks "Fetch VM Status" button
 
             // Load upcoming workshops
-            function loadUpcomingWorkshops() {
-                const saved = localStorage.getItem('vm-planning-entries');
-                if (!saved) {
-                    document.getElementById('upcoming-workshops-content').innerHTML = 
-                        '<div style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 20px;">No workshops scheduled yet. <a href="/planning" style="color: var(--accent);">Schedule your first workshop!</a></div>';
-                    return;
-                }
+            async function loadUpcomingWorkshops() {
+                try {
+                    const response = await fetch('/api/workshops');
+                    const data = await response.json();
+                    
+                    if (!data.success) {
+                        document.getElementById('upcoming-workshops-content').innerHTML = 
+                            '<div style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 20px;">Error loading workshops. <a href="/planning" style="color: var(--accent);">Try scheduling a workshop!</a></div>';
+                        return;
+                    }
 
-                const entries = JSON.parse(saved);
+                    const entries = JSON.parse(data.content);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
@@ -524,6 +527,10 @@
 
                 content += '</div>';
                 document.getElementById('upcoming-workshops-content').innerHTML = content;
+                } catch (error) {
+                    document.getElementById('upcoming-workshops-content').innerHTML = 
+                        '<div style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 20px;">Error loading workshops. <a href="/planning" style="color: var(--accent);">Try scheduling a workshop!</a></div>';
+                }
             }
 
             // Load upcoming workshops on page load

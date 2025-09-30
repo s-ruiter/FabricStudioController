@@ -340,16 +340,42 @@
             }
         }
 
-        function saveEntries() {
-            localStorage.setItem('vm-planning-entries', JSON.stringify(entries));
+        async function saveEntries() {
+            try {
+                const response = await fetch('/api/workshops', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ content: JSON.stringify(entries) })
+                });
+                
+                const data = await response.json();
+                if (!data.success) {
+                    showStatus(`Error saving workshops: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`Error saving workshops: ${error.message}`, 'error');
+            }
         }
 
-        function loadEntries() {
-            const saved = localStorage.getItem('vm-planning-entries');
-            if (saved) {
-                entries = JSON.parse(saved);
+        async function loadEntries() {
+            try {
+                const response = await fetch('/api/workshops');
+                const data = await response.json();
+                
+                if (data.success) {
+                    entries = JSON.parse(data.content);
+                } else {
+                    showStatus(`Error loading workshops: ${data.error}`, 'error');
+                    entries = [];
+                }
+                renderEntries();
+            } catch (error) {
+                showStatus(`Error loading workshops: ${error.message}`, 'error');
+                entries = [];
+                renderEntries();
             }
-            renderEntries();
         }
 
         function addEntry(date, workshopType, comment) {
