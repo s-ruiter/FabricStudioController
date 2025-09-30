@@ -266,8 +266,34 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="vm-count">Number of VMs needed:</label>
+                        <select id="vm-count" name="vm_count" required>
+                            <option value="">Select number of VMs...</option>
+                            <option value="1">1 VM</option>
+                            <option value="2">2 VMs</option>
+                            <option value="3">3 VMs</option>
+                            <option value="4">4 VMs</option>
+                            <option value="5">5 VMs</option>
+                            <option value="6">6 VMs</option>
+                            <option value="7">7 VMs</option>
+                            <option value="8">8 VMs</option>
+                            <option value="9">9 VMs</option>
+                            <option value="10">10 VMs</option>
+                            <option value="11">11 VMs</option>
+                            <option value="12">12 VMs</option>
+                            <option value="13">13 VMs</option>
+                            <option value="14">14 VMs</option>
+                            <option value="15">15 VMs</option>
+                            <option value="16">16 VMs</option>
+                            <option value="17">17 VMs</option>
+                            <option value="18">18 VMs</option>
+                            <option value="19">19 VMs</option>
+                            <option value="20">20 VMs</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="planning-comment">Comment:</label>
-                        <input type="text" id="planning-comment" name="comment" placeholder="Describe what the VMs will be used for, who will be using them, etc." maxlength="100" required>
+                        <input type="text" id="planning-comment" name="comment" placeholder="Enter workshop details..." maxlength="100" required>
                         <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">
                             <span id="char-count">0</span>/100 characters
                         </div>
@@ -326,6 +352,9 @@
                         <button class="delete-btn" onclick="deleteEntry(${index})">🗑️ Delete</button>
                     </div>
                     <div class="entry-workshop">${entry.workshopType || 'Unknown Workshop'}</div>
+                    <div class="entry-vm-count" style="margin: 8px 0; font-weight: 600; color: var(--accent);">
+                        📊 ${entry.vmCount || 0} VM${entry.vmCount !== 1 ? 's' : ''} needed
+                    </div>
                     <p class="entry-comment">${entry.comment}</p>
                 </div>
             `).join('');
@@ -378,11 +407,12 @@
             }
         }
 
-        function addEntry(date, workshopType, comment) {
+        function addEntry(date, workshopType, vmCount, comment) {
             const newEntry = {
                 id: Date.now(),
                 date: date,
                 workshopType: workshopType,
+                vmCount: parseInt(vmCount),
                 comment: comment,
                 created: new Date().toISOString()
             };
@@ -399,9 +429,10 @@
             
             const date = document.getElementById('planning-date').value;
             const workshopType = document.getElementById('workshop-type').value;
+            const vmCount = document.getElementById('vm-count').value;
             const comment = document.getElementById('planning-comment').value.trim();
             
-            if (!date || !workshopType || !comment) {
+            if (!date || !workshopType || !vmCount || !comment) {
                 showStatus('Please fill in all fields', 'error');
                 return;
             }
@@ -413,7 +444,7 @@
                 return;
             }
             
-            addEntry(date, workshopType, comment);
+            addEntry(date, workshopType, vmCount, comment);
             
             // Clear form
             document.getElementById('planning-form').reset();

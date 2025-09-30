@@ -490,6 +490,7 @@
                         <div style="padding: 12px; background: var(--elev-1); border-radius: 6px; border-left: 4px solid var(--accent);">
                             <div style="font-weight: 600; color: var(--accent); margin-bottom: 4px;">FAZ Workshop</div>
                             <div style="font-size: 0.9rem; color: var(--text-primary); margin-bottom: 4px;">${date}</div>
+                            <div style="font-size: 0.85rem; color: var(--accent); font-weight: 600; margin-bottom: 4px;">📊 ${firstFaz.vmCount || 0} VM${firstFaz.vmCount !== 1 ? 's' : ''} needed</div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">${firstFaz.comment}</div>
                         </div>
                     `;
@@ -513,6 +514,7 @@
                         <div style="padding: 12px; background: var(--elev-1); border-radius: 6px; border-left: 4px solid var(--accent);">
                             <div style="font-weight: 600; color: var(--accent); margin-bottom: 4px;">FAD/FWB Workshop</div>
                             <div style="font-size: 0.9rem; color: var(--text-primary); margin-bottom: 4px;">${date}</div>
+                            <div style="font-size: 0.85rem; color: var(--accent); font-weight: 600; margin-bottom: 4px;">📊 ${firstFad.vmCount || 0} VM${firstFad.vmCount !== 1 ? 's' : ''} needed</div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">${firstFad.comment}</div>
                         </div>
                     `;
