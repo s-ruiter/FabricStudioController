@@ -185,6 +185,11 @@ def editor():
     """JSON editor page for managing commands.json"""
     return render_template('editor.html', commands=COMMAND_OPTIONS, config=CONFIG)
 
+@app.route('/planning')
+def planning():
+    """VM planning page for scheduling VM usage"""
+    return render_template('planning.html')
+
 @app.route('/api/commands', methods=['GET'])
 def get_commands():
     """API endpoint to get current commands.json content"""

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VM Planning - FabricStudio Controller</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}?v=2" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2">
+    <style>
+        .planning-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .planning-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--elev-2);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .planning-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .nav-link {
+            padding: 10px 20px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        
+        .planning-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .add-entry-section {
+            background: var(--elev-2);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.2);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .save-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        
+        .save-btn:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .entries-section {
+            background: var(--elev-2);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .entry-item {
+            background: var(--elev-1);
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        
+        .entry-item:hover {
+            background: var(--elev-3);
+            transform: translateY(-1px);
+        }
+        
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .entry-date {
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+        
+        .delete-btn {
+            background: var(--status-red);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .delete-btn:hover {
+            background: #d63031;
+            transform: translateY(-1px);
+        }
+        
+        .entry-comment {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin: 0;
+        }
+        
+        .no-entries {
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            padding: 40px 20px;
+        }
+        
+        .status-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .status-success {
+            background: rgba(61, 220, 151, 0.15);
+            border: 1px solid var(--status-green);
+            color: #d7ffe8;
+        }
+        
+        .status-error {
+            background: rgba(255, 107, 107, 0.15);
+            border: 1px solid var(--status-red);
+            color: #ffd3d6;
+        }
+        
+        @media (max-width: 768px) {
+            .planning-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="planning-container">
+        <div class="planning-header">
+            <h1 class="planning-title">📅 VM Planning</h1>
+            <div class="nav-links">
+                <a href="/" class="nav-link">← Back to Main</a>
+                <a href="/editor" class="nav-link">⚙️ Edit Commands</a>
+            </div>
+        </div>
+
+        <div id="status-message" class="status-message"></div>
+
+        <div class="planning-content">
+            <div class="add-entry-section">
+                <h2 class="section-title">Add New Entry</h2>
+                <form id="planning-form">
+                    <div class="form-group">
+                        <label for="planning-date">Date:</label>
+                        <input type="date" id="planning-date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="planning-comment">Comment:</label>
+                        <textarea id="planning-comment" name="comment" placeholder="Describe what the VMs will be used for, who will be using them, etc." required></textarea>
+                    </div>
+                    <button type="submit" class="save-btn" id="save-btn">💾 Save Entry</button>
+                </form>
+            </div>
+
+            <div class="entries-section">
+                <h2 class="section-title">Scheduled Entries</h2>
+                <div id="entries-list">
+                    <div class="no-entries">No entries yet. Add your first planning entry!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let entries = [];
+
+        function showStatus(message, type = 'info') {
+            const statusMessage = document.getElementById('status-message');
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message status-${type}`;
+            statusMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function renderEntries() {
+            const entriesList = document.getElementById('entries-list');
+            
+            if (entries.length === 0) {
+                entriesList.innerHTML = '<div class="no-entries">No entries yet. Add your first planning entry!</div>';
+                return;
+            }
+
+            // Sort entries by date (newest first)
+            const sortedEntries = [...entries].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            entriesList.innerHTML = sortedEntries.map((entry, index) => `
+                <div class="entry-item">
+                    <div class="entry-header">
+                        <span class="entry-date">${formatDate(entry.date)}</span>
+                        <button class="delete-btn" onclick="deleteEntry(${index})">🗑️ Delete</button>
+                    </div>
+                    <p class="entry-comment">${entry.comment}</p>
+                </div>
+            `).join('');
+        }
+
+        function deleteEntry(index) {
+            if (confirm('Are you sure you want to delete this entry?')) {
+                entries.splice(index, 1);
+                saveEntries();
+                renderEntries();
+                showStatus('Entry deleted successfully', 'success');
+            }
+        }
+
+        function saveEntries() {
+            localStorage.setItem('vm-planning-entries', JSON.stringify(entries));
+        }
+
+        function loadEntries() {
+            const saved = localStorage.getItem('vm-planning-entries');
+            if (saved) {
+                entries = JSON.parse(saved);
+            }
+            renderEntries();
+        }
+
+        function addEntry(date, comment) {
+            const newEntry = {
+                id: Date.now(),
+                date: date,
+                comment: comment,
+                created: new Date().toISOString()
+            };
+            
+            entries.push(newEntry);
+            saveEntries();
+            renderEntries();
+            showStatus('Entry saved successfully!', 'success');
+        }
+
+        // Form submission
+        document.getElementById('planning-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const date = document.getElementById('planning-date').value;
+            const comment = document.getElementById('planning-comment').value.trim();
+            
+            if (!date || !comment) {
+                showStatus('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Check if entry already exists for this date
+            const existingEntry = entries.find(entry => entry.date === date);
+            if (existingEntry) {
+                if (confirm('An entry already exists for this date. Do you want to replace it?')) {
+                    existingEntry.comment = comment;
+                    saveEntries();
+                    renderEntries();
+                    showStatus('Entry updated successfully!', 'success');
+                }
+                return;
+            }
+            
+            addEntry(date, comment);
+            
+            // Clear form
+            document.getElementById('planning-form').reset();
+        });
+
+        // Set today's date as default
+        document.getElementById('planning-date').valueAsDate = new Date();
+
+        // Load entries on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadEntries();
+        });
+    </script>
+    
+    <!-- Footer with version and contact info -->
+    <footer style="margin-top: 40px; padding: 20px 0; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
+        <div style="margin-bottom: 8px;">
+            <a href="https://github.com/s-ruiter/FabricStudioController" target="_blank" rel="noopener noreferrer" style="color: var(--text-primary); text-decoration: none;">
+                <strong>FabricStudio Controller</strong>
+            </a> v1.4
+        </div>
+        <div style="margin-bottom: 4px;">
+            Developed by <strong>Sander Ruiter</strong>
+        </div>
+    </footer>
+</body>
+</html>
