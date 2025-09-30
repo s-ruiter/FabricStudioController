@@ -46,6 +46,19 @@
             {% endif %}
         </div>
 
+        <!-- Upcoming Workshops -->
+        <div class="upcoming-workshops" style="margin-bottom: 20px; padding: 16px; background: var(--elev-2); border-radius: 8px; border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">📅 Upcoming Workshops</span>
+                <a href="/planning" style="padding: 6px 12px; background: var(--accent); color: white; text-decoration: none; border-radius: 6px; font-size: 0.9rem; transition: all 0.2s ease;" onmouseover="this.style.background='var(--accent-hover)'" onmouseout="this.style.background='var(--accent)'">View All</a>
+            </div>
+            <div id="upcoming-workshops-content">
+                <div style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 20px;">
+                    Loading upcoming workshops...
+                </div>
+            </div>
+        </div>
+
         <div class="grid-2col">
             <section class="left-col">
                 <form method="post">
@@ -435,6 +448,89 @@
             toggleExtraInput();
 
             // VM list will be loaded when user clicks "Fetch VM Status" button
+
+            // Load upcoming workshops
+            function loadUpcomingWorkshops() {
+                const saved = localStorage.getItem('vm-planning-entries');
+                if (!saved) {
+                    document.getElementById('upcoming-workshops-content').innerHTML = 
+                        '<div style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 20px;">No workshops scheduled yet. <a href="/planning" style="color: var(--accent);">Schedule your first workshop!</a></div>';
+                    return;
+                }
+
+                const entries = JSON.parse(saved);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                // Filter future entries and sort by date
+                const futureEntries = entries
+                    .filter(entry => new Date(entry.date) >= today)
+                    .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                if (futureEntries.length === 0) {
+                    document.getElementById('upcoming-workshops-content').innerHTML = 
+                        '<div style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 20px;">No upcoming workshops scheduled. <a href="/planning" style="color: var(--accent);">Schedule a workshop!</a></div>';
+                    return;
+                }
+
+                // Find first upcoming FAZ and FAD/FWB workshops
+                const firstFaz = futureEntries.find(entry => entry.workshopType === 'FAZ Workshop');
+                const firstFad = futureEntries.find(entry => entry.workshopType === 'FAD/FWB Workshop');
+
+                let content = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">';
+
+                // FAZ Workshop
+                if (firstFaz) {
+                    const date = new Date(firstFaz.date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    content += `
+                        <div style="padding: 12px; background: var(--elev-1); border-radius: 6px; border-left: 4px solid var(--accent);">
+                            <div style="font-weight: 600; color: var(--accent); margin-bottom: 4px;">FAZ Workshop</div>
+                            <div style="font-size: 0.9rem; color: var(--text-primary); margin-bottom: 4px;">${date}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">${firstFaz.comment}</div>
+                        </div>
+                    `;
+                } else {
+                    content += `
+                        <div style="padding: 12px; background: var(--elev-1); border-radius: 6px; border-left: 4px solid var(--text-secondary);">
+                            <div style="font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">FAZ Workshop</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); font-style: italic;">No upcoming workshops</div>
+                        </div>
+                    `;
+                }
+
+                // FAD/FWB Workshop
+                if (firstFad) {
+                    const date = new Date(firstFad.date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    content += `
+                        <div style="padding: 12px; background: var(--elev-1); border-radius: 6px; border-left: 4px solid var(--accent);">
+                            <div style="font-weight: 600; color: var(--accent); margin-bottom: 4px;">FAD/FWB Workshop</div>
+                            <div style="font-size: 0.9rem; color: var(--text-primary); margin-bottom: 4px;">${date}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">${firstFad.comment}</div>
+                        </div>
+                    `;
+                } else {
+                    content += `
+                        <div style="padding: 12px; background: var(--elev-1); border-radius: 6px; border-left: 4px solid var(--text-secondary);">
+                            <div style="font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">FAD/FWB Workshop</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); font-style: italic;">No upcoming workshops</div>
+                        </div>
+                    `;
+                }
+
+                content += '</div>';
+                document.getElementById('upcoming-workshops-content').innerHTML = content;
+            }
+
+            // Load upcoming workshops on page load
+            loadUpcomingWorkshops();
 
             // Confirmation for risky actions
             const formEl = document.querySelector('form');
