@@ -101,6 +101,17 @@
             box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.2);
         }
         
+        /* Style date picker icon to be white and visible */
+        .form-group input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+        
+        .form-group input[type="date"]::-webkit-inner-spin-button,
+        .form-group input[type="date"]::-webkit-clear-button {
+            display: none;
+        }
+        
         .save-btn {
             width: 100%;
             padding: 12px;
@@ -224,7 +235,12 @@
 <body>
     <div class="planning-container">
         <div class="planning-header">
-            <h1 class="planning-title">📅 Workshop Schedule</h1>
+            <div>
+                <h1 class="planning-title">📅 Workshop Schedule</h1>
+                <div style="color: #ff6b6b; font-size: 0.9rem; margin-top: 4px; font-weight: 500;">
+                    ⚠️ VMs are not started automatically.
+                </div>
+            </div>
             <div class="nav-links">
                 <a href="/" class="nav-link">← Back to Main</a>
                 <a href="/editor" class="nav-link">⚙️ Edit Commands</a>
@@ -258,11 +274,6 @@
                     </div>
                     <button type="submit" class="save-btn" id="save-btn">💾 Save Entry</button>
                 </form>
-                <div style="margin-top: 16px; padding: 12px; background: rgba(255, 107, 107, 0.1); border: 1px solid var(--status-red); border-radius: 6px;">
-                    <div style="color: var(--status-red); font-weight: 500; font-size: 0.9rem;">
-                        ⚠️ VMs are not started automatically.
-                    </div>
-                </div>
             </div>
 
             <div class="entries-section">
