@@ -411,9 +411,9 @@ def save_workshops():
                      remote_addr=request.remote_addr)
             return jsonify({'success': False, 'error': f'Invalid JSON: {str(e)}'}), 400
         
-        # Save new content
+        # Save new content with proper formatting
         with open('workshop_schedule.json', 'w') as f:
-            f.write(content)
+            json.dump(parsed, f, indent=4)
         
         log_event('info', 'Workshop schedule saved',
                  entry_count=entry_count,
