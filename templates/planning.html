@@ -342,8 +342,8 @@
                 return;
             }
 
-            // Sort entries by date (newest first)
-            const sortedEntries = [...entries].sort((a, b) => new Date(b.date) - new Date(a.date));
+            // Sort entries by date (upcoming first)
+            const sortedEntries = [...entries].sort((a, b) => new Date(a.date) - new Date(b.date));
 
             entriesList.innerHTML = sortedEntries.map((entry) => `
                 <div class="entry-item">

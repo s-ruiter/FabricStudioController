@@ -1,1 +1,18 @@
-[]
+[
+    {
+        "id": 1759321760534,
+        "date": "2025-10-01",
+        "workshopType": "FAD/FWB Workshop",
+        "vmCount": 4,
+        "comment": "Snader test2",
+        "created": "2025-10-01T12:29:20.534Z"
+    },
+    {
+        "id": 1759321774752,
+        "date": "2025-10-02",
+        "workshopType": "FAZ Workshop",
+        "vmCount": 3,
+        "comment": "Sander Test 3",
+        "created": "2025-10-01T12:29:34.752Z"
+    }
+]
