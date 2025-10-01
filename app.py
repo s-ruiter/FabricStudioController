@@ -14,9 +14,11 @@ from functools import wraps
 # --- Logging Setup ---
 def setup_logging():
     """Configure logging for access and events."""
-    # Create logs directory if it doesn't exist
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
+    # Create logs directory if it doesn't exist (race-condition safe for gunicorn workers)
+    try:
+        os.makedirs('logs', exist_ok=True)
+    except OSError:
+        pass  # Directory already exists or permission issue
     
     # Access log configuration
     access_logger = logging.getLogger('access')
