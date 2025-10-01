@@ -43,3 +43,4 @@ gcp-credentials.json
 
 # Logs
 *.log
+logs/
