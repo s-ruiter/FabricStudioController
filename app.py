@@ -579,4 +579,5 @@ if __name__ == '__main__':
     print("   Access log: logs/access.log")
     print("   Events log: logs/events.log\n")
     
-    app.run(debug=True)
+    port = int(os.environ.get("FLASK_RUN_PORT", 5000))
+    app.run(debug=True, port=port, host="0.0.0.0")
