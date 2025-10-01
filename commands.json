@@ -2,15 +2,15 @@
   "_config": {
     "default_vm_filter": "sru-fstudio-faz"
   },
-  "Start FAZ workshop POC": {
-    "command": "runtime fabric install --power-on-vms FAZ-Workshop2025",
-    "responses": {},
-    "disconnect": false
-  },
   "Stop FAZ workshop POC": {
     "command": "runtime fabric uninstall",
     "responses": {},
     "warning": true
+  },
+  "Start FAZ workshop POC": {
+    "command": "runtime fabric install --power-on-vms FAZ-Workshop2025",
+    "responses": {},
+    "disconnect": false
   },
   "Shutdown Fabric Studio and VM": {
     "command": "system execute shutdown --no-interactive",
@@ -29,7 +29,8 @@
     "requires_extra_input": true,
     "prompt": "New password for guest user:",
     "responses": {},
-    "disconnect": false
+    "disconnect": false,
+    "disabled": true
   },
   "Shutdown FAD FortiPoC and VM": {
     "command": "execute shutdown",

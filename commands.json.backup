@@ -21,18 +21,22 @@
     "command": "system execute upgrade --no-interactive",
     "responses": {},
     "disconnect": true,
-    "warning": true
+    "warning": true,
+    "disabled": true
   },
   "Change guest user password": {
     "command": "execute password guest {extra_input}",
     "requires_extra_input": true,
     "prompt": "New password for guest user:",
     "responses": {},
-    "disconnect": false
+    "disconnect": false,
+    "disabled": true
   },
   "Shutdown FAD FortiPoC and VM": {
     "command": "execute shutdown",
-    "responses": {"Confirm shutdown" : "y\n"},
+    "responses": {
+      "Confirm shutdown": "y\n"
+    },
     "warning": true,
     "disconnect": true
   },
